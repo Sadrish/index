@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Interactive Glossary</title>
+  <style>
+    :root{
+      --bg:#0b1020; --card:#121a2f; --muted:#9fb0c2; --text:#eaf1ff; --accent:#6ee7ff; --accent2:#a78bfa; --border:#223055;
+    }
+    html,body{height:100%}
+    body{margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;background:linear-gradient(180deg,#0b1020, #121a2f 30%, #0b1020 100%);color:var(--text)}
+    .container{max-width:1100px;margin:0 auto;padding:24px}
+    header{display:flex;gap:16px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+    h1{font-size:clamp(22px,3.2vw,34px);margin:0;letter-spacing:.3px}
+    .sub{color:var(--muted);font-size:14px}
+    .controls{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-top:14px}
+    .search{flex:1 1 280px;display:flex;align-items:center;border:1px solid var(--border);background:rgba(255,255,255,.02);border-radius:12px;padding:10px 12px}
+    .search input{all:unset;flex:1;font-size:14px;color:var(--text)}
+    .btn{border:1px solid var(--border);background:rgba(255,255,255,.03);color:var(--text);padding:10px 12px;border-radius:12px;cursor:pointer;user-select:none;transition:.2s}
+    .btn:hover{transform:translateY(-1px);border-color:#2f4377}
+    .btn[aria-pressed="true"]{outline:2px solid var(--accent);}
+    .chiprow{display:flex;gap:6px;overflow:auto;padding-bottom:4px;margin-top:8px}
+    .chip{font-size:12px;border:1px solid var(--border);padding:6px 8px;border-radius:10px;color:var(--muted);cursor:pointer;white-space:nowrap;background:rgba(255,255,255,.02)}
+    .chip.active{color:var(--text);border-color:var(--accent);}
+
+    /* grid */
+    .grid{display:grid;grid-template-columns:repeat(1,minmax(0,1fr));gap:14px;margin-top:16px}
+    @media (min-width:600px){.grid{grid-template-columns:repeat(2,1fr)}}
+    @media (min-width:900px){.grid{grid-template-columns:repeat(3,1fr)}}
+
+    .card{background:linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.02));border:1px solid var(--border);border-radius:16px;padding:14px 14px 12px;display:flex;flex-direction:column;gap:8px;min-height:130px;position:relative}
+    .term{font-weight:700;letter-spacing:.2px;line-height:1.25}
+    .def{color:var(--muted);font-size:14px;line-height:1.35}
+    .card .open{margin-top:auto;align-self:flex-start}
+    .pill{font-size:11px;color:#d1e8ff;background:linear-gradient(90deg,rgba(110,231,255,.15),rgba(167,139,250,.12));border:1px solid var(--border);padding:4px 7px;border-radius:999px}
+
+    /* list view */
+    .list .grid{grid-template-columns:1fr}
+    .list .def{display:block}
+
+    /* footer */
+    footer{opacity:.85;color:var(--muted);text-align:center;margin:22px 0}
+
+    /* modal */
+    dialog{width:min(720px,96vw);background:var(--card);border:1px solid var(--border);border-radius:16px;color:var(--text);padding:0}
+    dialog::backdrop{background:rgba(7,10,22,.6)}
+    .modal-header{display:flex;gap:12px;align-items:center;justify-content:space-between;padding:16px 18px;border-bottom:1px solid var(--border)}
+    .modal-body{padding:18px}
+    .actions{display:flex;gap:8px}
+
+    /* quiz */
+    .quiz{margin-top:16px;border:1px dashed #2a3a68;border-radius:14px;padding:14px;display:none}
+    .quiz.active{display:block}
+    .kbd{font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;border:1px solid var(--border);border-bottom-width:3px;background:rgba(255,255,255,.03);border-radius:8px;padding:2px 6px;font-size:12px}
+
+    /* utilities */
+    .hidden{display:none}
+    .muted{color:var(--muted)}
+    .row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+  </style>
+</head>
+<body>
+  <div class="container" id="app">
+    <header>
+      <div>
+        <h1>Glossary of Key Terms</h1>
+        <div class="sub">Search, filter A–Z, click a term for details, or switch to Quiz Mode.</div>
+      </div>
+      <div class="row">
+        <button class="btn" id="toggleViewBtn" aria-pressed="false" title="Toggle list/grid view">Toggle View</button>
+        <button class="btn" id="quizBtn" aria-pressed="false" title="Practice with flashcards">Quiz Mode</button>
+      </div>
+    </header>
+
+    <div class="controls">
+      <label class="search" aria-label="Search terms">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="opacity:.7;margin-right:8px"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+        <input id="search" placeholder="Search term or definition…" autocomplete="off" />
+        <kbd class="kbd" title="Press to clear" id="clearKbd">Esc</kbd>
+      </label>
+      <div class="chiprow" id="az"></div>
+    </div>
+
+    <section id="quiz" class="quiz" aria-live="polite">
+      <div class="row" style="justify-content:space-between">
+        <div>
+          <div class="pill" id="quizCounter">1 / 1</div>
+          <h3 id="quizTerm" class="term" style="margin:.4rem 0 0"></h3>
+        </div>
+        <div class="row">
+          <button class="btn" id="reveal">Reveal</button>
+          <button class="btn" id="next">Next</button>
+          <button class="btn" id="shuffle">Shuffle</button>
+        </div>
+      </div>
+      <p id="quizDef" class="def muted" style="margin-top:8px"></p>
+    </section>
+
+    <main class="grid" id="grid" role="list"></main>
+
+    <footer>
+      <small>Tip: use the keyboard — type to search, <span class="kbd">Esc</span> to clear, <span class="kbd">Enter</span> to open the first result.</small>
+    </footer>
+  </div>
+
+  <!-- Detail Modal -->
+  <dialog id="modal" aria-labelledby="modalTitle">
+    <div class="modal-header">
+      <h3 id="modalTitle" class="term" style="margin:0"></h3>
+      <div class="actions">
+        <button class="btn" id="copyLink">Copy Link</button>
+        <button class="btn" id="closeModal" autofocus>Close</button>
+      </div>
+    </div>
+    <div class="modal-body">
+      <p id="modalDef" class="def" style="font-size:15px"></p>
+    </div>
+  </dialog>
+
+  <script>
+    // ----- DATA (edit this array only) -----
+    const TERMS = [
+      {term:"10 Blue Links",def:"The original, simple format of Google's search results page, displaying ten clickable hyperlinks in a vertical stack."},
+      {term:"0-Click Results",def:"Search engine results where the user's query is answered directly on the SERP, eliminating the need to click on any external links."},
+      {term:"AI Search",def:"The evolution of search engines to incorporate artificial intelligence, particularly generative AI, to understand queries, synthesize information, and provide direct answers."},
+      {term:"Answer Engine Optimization (AEO)",def:"An alternative term proposed for optimizing content for search engines that provide direct answers, rather than just links."},
+      {term:"Answer Surface",def:"The transformed Search Engine Results Page (SERP) that provides direct answers, summaries, and various information elements, rather than just a list of links."},
+      {term:"BERT (Bidirectional Encoder Representations from Transformers)",def:"A breakthrough transformer model (2018) that helped Google understand the context of words in a sentence, not just their individual keywords."},
+      {term:"Cognitive Costs",def:"The mental effort required by users to formulate search queries and analyze the presented search results."},
+      {term:"Content Resonance",def:"The concept of turning search visibility (achieved through Relevance Engineering) into a lasting connection with the audience."},
+      {term:"Entity",def:"A distinct, well-defined thing or concept (e.g., a person, place, organization, or idea) that search engines can understand and connect through a Knowledge Graph."},
+      {term:"Featured Snippets",def:"Answer boxes pulled directly from website content and displayed at the top of Google's search results to provide quick answers."},
+      {term:"Generative AI",def:"Artificial intelligence models, such as large language models (LLMs), that can generate new content, including text, images, or code, based on prompts and existing data."},
+      {term:"Generative Engine Optimization (GEO)",def:"The process of optimizing content, data structures, and authority signals specifically for generative engines to understand, extract, and accurately present information as part of an AI-generated answer."},
+      {term:"Knowledge Graph (2012)",def:"Google's semantic information network that shifted its understanding from matching words to understanding entities and concepts, displaying facts about people, places, and things directly on the SERP."},
+      {term:"Large Language Models (LLMs)",def:"Advanced AI models (e.g., GPT, Gemini, Claude) capable of processing and generating human-like text, forming the basis of conversational AI search."},
+      {term:"Latent Intent",def:"The underlying, unspoken purpose or need behind a user's search query, which AI systems aim to uncover beyond the explicit keywords."},
+      {term:"Lexical Search",def:"Traditional search methods that primarily rely on matching keywords in a query to keywords in documents."},
+      {term:"Model Context Protocol (MCP)",def:"A system that transforms static content into dynamic, actionable AI experiences, enabling primary AI agents to spawn multiple specialized agents for complex task completion."},
+      {term:"MUM (Multitask Unified Model) & PaLM (Pathways Language Model) (2021–2022)",def:"Advanced Google AI models that enable processing of multimedia and complex queries in a single step."},
+      {term:"Neural Search",def:"Search methods that leverage neural networks and machine learning to understand content and queries based on meaning and context, moving beyond lexical matching."},
+      {term:"Query Fan-Out",def:"The process by which a single user query is expanded or interpreted in multiple ways to explore various related intents and retrieve a broader range of potentially relevant information."},
+      {term:"Relevance Engineering",def:"A channel-agnostic, multidisciplinary approach that systematically positions content within information systems to deliver highly pertinent and valuable results, focusing on context, intent, and data relationships."},
+      {term:"Retrieval-Augmented Generation (RAG)",def:"An AI system architecture that combines retrieving relevant, up-to-date information from external sources with a generative model to synthesize that information into a human-readable answer."},
+      {term:"Semantic Clarity",def:"The quality of content being unambiguous, well-structured, and aligned with concepts that AI models can easily recognize and understand."},
+      {term:"Semantic Clustering",def:"Grouping related content or entities based on their meaning rather than just keywords, which is crucial for AI models to understand topical relevance."},
+      {term:"Semantic Search",def:"Search that goes beyond keyword matching to understand the meaning and context of a user's query and the content, often using vector embeddings."},
+      {term:"Search Engine Optimization (SEO)",def:"The process of improving the visibility of a website or web page in a search engine's unpaid results, traditionally focused on ranking for specific keywords."},
+      {term:"Search Engine Results Page (SERP)",def:"The page displayed by a search engine in response to a user's query."},
+      {term:"Structured Data",def:"Standardized formats for providing information about a webpage, helping search engines understand its content more effectively (e.g., Schema.org markup)."},
+      {term:"Universal Search (2007)",def:"Google's integration of various content types (images, news, videos) into a single search results page."},
+      {term:"Vector Embeddings",def:"Numerical representations of words, phrases, or documents in a multi-dimensional space, where the distance between vectors reflects their semantic similarity; used in semantic search."},
+      {term:"Zero-Click AI Overviews",def:"AI-generated summaries or answers presented directly on the SERP, often without providing a traditional link to the source, fulfilling the user's intent without a click."}
+    ];
+
+    // ----- UTILITIES -----
+    const slug = s => s.toLowerCase().replace(/&/g,' and ').replace(/[^a-z0-9+ ]+/g,'').trim().replace(/\s+/g,'-');
+
+    // ----- STATE -----
+    let state = { q: "", letter: "", view: "grid", quizIdx: 0, quizOrder: [] };
+
+    const els = {
+      grid: document.getElementById('grid'),
+      search: document.getElementById('search'),
+      az: document.getElementById('az'),
+      toggleViewBtn: document.getElementById('toggleViewBtn'),
+      quizBtn: document.getElementById('quizBtn'),
+      quiz: document.getElementById('quiz'),
+      quizTerm: document.getElementById('quizTerm'),
+      quizDef: document.getElementById('quizDef'),
+      quizCounter: document.getElementById('quizCounter'),
+      reveal: document.getElementById('reveal'),
+      next: document.getElementById('next'),
+      shuffle: document.getElementById('shuffle'),
+      modal: document.getElementById('modal'),
+      modalTitle: document.getElementById('modalTitle'),
+      modalDef: document.getElementById('modalDef'),
+      copyLink: document.getElementById('copyLink'),
+      clearKbd: document.getElementById('clearKbd'),
+    };
+
+    // Build A–Z chips
+    const letters = ['All',...Array.from({length:26},(_,i)=>String.fromCharCode(65+i))];
+    letters.forEach(l=>{
+      const c = document.createElement('button');
+      c.className='chip'; c.textContent=l; c.dataset.letter = l==='All'?'':l;
+      c.addEventListener('click',()=>{ state.letter=c.dataset.letter; updateAZ(); render(); });
+      els.az.appendChild(c);
+    });
+    function updateAZ(){
+      [...els.az.children].forEach(ch=>{
+        ch.classList.toggle('active', ch.dataset.letter === state.letter);
+      });
+    }
+    updateAZ();
+
+    // Render cards/list
+    function render(){
+      const q = state.q.trim().toLowerCase();
+      let data = TERMS.slice();
+      if(state.letter){ data = data.filter(x=> x.term.toUpperCase().startsWith(state.letter)); }
+      if(q){ data = data.filter(x=> x.term.toLowerCase().includes(q) || x.def.toLowerCase().includes(q)); }
+
+      els.grid.parentElement.classList.toggle('list', state.view==='list');
+
+      els.grid.innerHTML='';
+      if(data.length===0){
+        const div = document.createElement('div');
+        div.className='muted';
+        div.textContent='No matches. Try a different letter or search term.';
+        els.grid.appendChild(div);
+        return;
+      }
+
+      data.forEach(item=>{
+        const card = document.createElement('article');
+        card.className='card'; card.tabIndex = 0; card.setAttribute('role','listitem');
+        card.innerHTML = `
+          <div class="pill">${item.term.charAt(0).toUpperCase()}</div>
+          <div class="term">${item.term}</div>
+          <div class="def">${item.def}</div>
+          <button class="btn open">Open</button>
+        `;
+        const open = () => openModal(item);
+        card.querySelector('.open').addEventListener('click', open);
+        card.addEventListener('keydown', e=>{ if(e.key==='Enter') open(); });
+        els.grid.appendChild(card);
+      });
+    }
+
+    function openModal(item){
+      els.modalTitle.textContent = item.term;
+      els.modalDef.textContent = item.def;
+      els.copyLink.onclick = () => {
+        const url = location.origin + location.pathname + '#' + slug(item.term);
+        navigator.clipboard.writeText(url).then(()=>{
+          els.copyLink.textContent='Copied!';
+          setTimeout(()=> els.copyLink.textContent='Copy Link', 900);
+        });
+      };
+      els.modal.showModal();
+      location.hash = slug(item.term);
+    }
+
+    function closeModal(){ els.modal.close(); }
+
+    // Hash deep-link
+    function handleHash(){
+      const h = decodeURIComponent(location.hash.replace('#',''));
+      if(!h) return;
+      const item = TERMS.find(t => slug(t.term)===h);
+      if(item) openModal(item);
+    }
+
+    // Quiz logic
+    function shuffleOrder(){ state.quizOrder = TERMS.map((_,i)=>i).sort(()=>Math.random()-.5); state.quizIdx=0; }
+    function showQuiz(){
+      if(state.quizOrder.length===0) shuffleOrder();
+      const i = state.quizOrder[state.quizIdx % state.quizOrder.length];
+      const item = TERMS[i];
+      els.quizTerm.textContent = item.term;
+      els.quizDef.textContent = item.def;
+      els.quizDef.classList.add('hidden');
+      els.quizCounter.textContent = `${(state.quizIdx%state.quizOrder.length)+1} / ${state.quizOrder.length}`;
+    }
+
+    // Events
+    els.search.addEventListener('input', e=>{ state.q = e.target.value; render(); });
+    els.clearKbd.addEventListener('click', ()=>{ els.search.value=''; state.q=''; render(); });
+    document.addEventListener('keydown', e=>{
+      if(e.key==='Escape'){ els.search.value=''; state.q=''; render(); }
+      if(e.key==='Enter'){
+        const firstBtn = els.grid.querySelector('.open');
+        if(firstBtn) firstBtn.click();
+      }
+    });
+    els.toggleViewBtn.addEventListener('click', ()=>{
+      state.view = state.view==='grid' ? 'list' : 'grid';
+      const pressed = state.view==='list';
+      els.toggleViewBtn.setAttribute('aria-pressed', String(pressed));
+      render();
+    });
+
+    els.quizBtn.addEventListener('click', ()=>{
+      const active = !els.quiz.classList.contains('active');
+      els.quiz.classList.toggle('active', active);
+      els.quizBtn.setAttribute('aria-pressed', String(active));
+      if(active) showQuiz();
+    });
+    els.reveal.addEventListener('click', ()=> els.quizDef.classList.remove('hidden'));
+    els.next.addEventListener('click', ()=>{ state.quizIdx++; showQuiz(); });
+    els.shuffle.addEventListener('click', ()=>{ shuffleOrder(); showQuiz(); });
+
+    document.getElementById('closeModal').addEventListener('click', closeModal);
+    els.modal.addEventListener('close', ()=>{
+      if(location.hash) history.replaceState(null,'',location.pathname);
+    });
+
+    // Init
+    render();
+    handleHash();
+    window.addEventListener('hashchange', handleHash);
+  </script>
+</body>
+</html>
