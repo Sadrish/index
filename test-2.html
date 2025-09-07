@@ -28,86 +28,85 @@
         // Your schema template (replace with your actual schema)
          // Generic ProductGroup Template
         const template = [
-            {
-                "@context": "https://schema.org",
-                "@type": "Organization",
-                "name": "{{brand_name}}",
-                "url": "{{brand_url}}",
-                "logo": "{{brand_logo}}",
-                "sameAs": []
-            },
-            {
-                "@context": "https://schema.org/",
-                "@type": "WebSite",
-                "name": "{{brand_name}}",
-                "url": "{{brand_url}}",
-                "potentialAction": {
-                    "@type": "SearchAction",
-                    "target": "{{brand_search_url}}?q={search_term_string}",
-                    "query-input": "required name=search_term_string"
-                }
-            },
-            {
-                "@context": "https://schema.org/",
-                "@type": "BreadcrumbList",
-                "itemListElement": [
-                    {
-                        "@type": "ListItem",
-                        "position": 1,
-                        "name": "{{brand_homepage_name}}",
-                        "item": "{{brand_url}}"
-                    },
-                    {
-                        "@type": "ListItem",
-                        "position": 2,
-                        "name": "{{product_name}}",
-                        "item": "{{product_url}}"
-                    }
-                ]
-            },
-            {
-                "@context": "https://schema.org",
-                "@type": "ProductGroup",
-                "name": "{{product_name}}",
-                "description": "{{description}}",
-                "category": {
-                    "@type": "DefinedTerm",
-                    "name": "{{category}}",
-                    "inDefinedTermSet": "{{brand_terms_url}}"
-                },
-                "hasVariant": []
-            }
-        ];
-
-        // Variant Template
-        const variantTemplate = {
-            "@type": "Product",
-            "name": "{{variant_name}}",
-            "url": "{{product_url}}?quantity=1",
-            "image": ["{{image}}"],
-            "color": "{{color}}",
-            "sku": "{{sku}}",
-            "brand": {
-                "@type": "Brand",
-                "name": "{{variant_brand_name}}"
-            },
-            "offers": {
-                "@type": "AggregateOffer",
-                "priceCurrency": "{{price_currency}}",
-                "lowPrice": "{{low_price}}",
-                "highPrice": "{{high_price}}",
-                "availability": "{{availability}}",
-                "url": "{{product_url}}?quantity=1",
-                "itemCondition": "https://schema.org/NewCondition",
-                "sku": "{{sku}}",
-                "seller": {
-                    "@type": "Organization",
-                    "name": "{{brand_name}}",
-                    "url": "{{brand_url}}",
-                    "logo": "{{brand_logo}}"
-                }
-            }
-        };
+  {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "name": "{{brand_name}}",
+    "url": "{{brand_url}}",
+    "logo": "{{brand_logo}}",
+    "sameAs": {{brand_social_links}}
+  },
+  {
+    "@context": "https://schema.org/",
+    "@type": "WebSite",
+    "name": "{{brand_name}}",
+    "url": "{{brand_url}}",
+    "potentialAction": {
+      "@type": "SearchAction",
+      "target": "{{brand_search_url}}?q={search_term_string}",
+      "query-input": "required name=search_term_string"
+    }
+  },
+  {
+    "@context": "https://schema.org/",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "{{brand_homepage_name}}",
+        "item": "{{brand_url}}"
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": "{{product_name}}",
+        "item": "{{product_url}}"
+      }
+    ]
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "ProductGroup",
+    "name": "{{product_name}}",
+    "description": "{{description}}",
+    "category": {
+      "@type": "DefinedTerm",
+      "name": "{{category}}",
+      "inDefinedTermSet": "{{brand_terms_url}}"
+    },
+    "hasVariant": [
+      {
+        "@type": "Product",
+        "name": "{{variant_name}}",
+        "url": "{{product_url}}?quantity=1",
+        "image": ["{{image}}"],
+        "color": "{{color}}",
+        "sku": "{{sku}}",
+        "brand": {
+          "@type": "Brand",
+          "name": "{{variant_brand_name}}"
+        },
+        "offers": {
+          "@type": "AggregateOffer",
+          "priceCurrency": "{{price_currency}}",
+          "lowPrice": "{{low_price}}",
+          "highPrice": "{{high_price}}",
+          "availability": "{{availability}}",
+          "url": "{{product_url}}?quantity=1",
+          "itemCondition": "https://schema.org/NewCondition",
+          "sku": "{{sku}}",
+          "seller": {
+            "@type": "Organization",
+            "name": "{{brand_name}}",
+            "url": "{{brand_url}}",
+            "logo": "{{brand_logo}}"
+          }
+        }
+      }
+    ]
+  }
+];
 
         function generateSchemas() {
             const fileInput = document.getElementById('csvFile');
