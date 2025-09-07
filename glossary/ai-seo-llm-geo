@@ -52,8 +52,17 @@
   <div class="container" id="app">
     <header>
       <div>
-        <h1>The Paradigm Shift - Glossaries</h1>
-        <div class="sub">Search, A–Z filter, modal details & Quiz Mode (Coming Soon). Internal Doc for Reso Team</div>
+        <h1>Comprehensive Glossaries for AI, SEO, LLMs, and GEO</h1>
+<div class="sub">
+   Explore an organized, easy-to-navigate collection of essential terms and definitions 
+   across Artificial Intelligence (AI), Search Engine Optimization (SEO), Large Language Models (LLMs), 
+   and Geographic/Geospatial concepts (GEO). <br><br>
+   Features include:  
+   • A–Z filtering for quick access to terms  
+   • Detailed modal pop-ups for in-depth explanations and examples  
+   • Interactive Quiz Mode to test and reinforce your knowledge  
+   • Continuous updates with the latest industry vocabulary and trends  
+</div>
       </div>
       <div class="row">
         <button class="btn" id="toggleViewBtn" aria-pressed="false" title="Toggle list/grid view">Toggle View</button>
