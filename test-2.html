@@ -26,8 +26,9 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
     <script>
         // Your schema template (replace with your actual schema)
-         // Generic ProductGroup Template
-        const template = [
+        const schemaTemplate = 
+            <script type="application/ld+json">
+            [
   {
     "@context": "https://schema.org",
     "@type": "Organization",
@@ -106,7 +107,8 @@
       }
     ]
   }
-];
+]
+            </script>;
 
         function generateSchemas() {
             const fileInput = document.getElementById('csvFile');
