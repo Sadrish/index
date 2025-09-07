@@ -27,7 +27,7 @@
     <script>
         // Your schema template (replace with your actual schema)
          // Template 1: Single Product
-        const template1 = [
+        const template = [
             {
                 "@context": "https://schema.org",
                 "@type": "Organization",
@@ -165,36 +165,6 @@
                 "hasVariant": []
             }
         ];
-
-        // Variant template for Template 2
-        const variantTemplate = {
-            "@type": "Product",
-            "name": "{{product_name}}",
-            "url": "{{product_url}}?quantity=1",
-            "image": ["{{image}}"],
-            "color": "{{color}}",
-            "sku": "{{sku}}",
-            "brand": {
-                "@type": "Brand",
-                "name": "{{brand_name}}"
-            },
-            "offers": {
-                "@type": "AggregateOffer",
-                "priceCurrency": "AUD",
-                "lowPrice": "{{low_price}}",
-                "highPrice": "{{high_price}}",
-                "availability": "{{availability}}",
-                "url": "{{product_url}}?quantity=1",
-                "itemCondition": "https://schema.org/NewCondition",
-                "sku": "{{sku}}",
-                "seller": {
-                    "@type": "Organization",
-                    "name": "Amart Furniture",
-                    "url": "https://www.amartfurniture.com.au/",
-                    "logo": "https://www.amartfurniture.com.au/on/demandware.static/-/Library-Sites-amart-shared-library/default/dwc4568a03/images/Logos/logo.svg"
-                }
-            }
-        };
 
         function generateSchemas() {
             const fileInput = document.getElementById('csvFile');
