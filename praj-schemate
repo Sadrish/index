@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Product Schema Generator</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        h1 { color: #333; }
+        input, button { margin: 10px 0; }
+        button { padding: 10px; background: #007BFF; color: white; border: none; cursor: pointer; }
+        button:hover { background: #0056b3; }
+        #status { color: green; }
+        #error { color: red; }
+    </style>
+</head>
+<body>
+    <h1>Product Schema Generator</h1>
+    <p>Upload a CSV file to generate Schema.org product schemas.</p>
+    <input type="file" id="csvFile" accept=".csv">
+    <button onclick="generateSchemas()">Generate Schemas</button>
+    <div id="status"></div>
+    <div id="error"></div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+    <script>
+        // Your schema template (replace with your actual schema)
+        const schemaTemplate = {
+            "@context": "https://schema.org/",
+            "@type": "Product",
+            "name": "{{name}}",
+            "image": "{{image}}",
+            "description": "{{description}}",
+            "sku": "{{sku}}",
+            "brand": {
+                "@type": "Brand",
+                "name": "{{brand}}"
+            },
+            "offers": {
+                "@type": "Offer",
+                "url": "{{url}}",
+                "priceCurrency": "{{currency}}",
+                "price": "{{price}}",
+                "availability": "https://schema.org/InStock"
+            }
+        };
+
+        function generateSchemas() {
+            const fileInput = document.getElementById('csvFile');
+            const status = document.getElementById('status');
+            const error = document.getElementById('error');
+            status.textContent = '';
+            error.textContent = '';
+
+            if (!fileInput.files.length) {
+                error.textContent = 'Please select a CSV file.';
+                return;
+            }
+
+            const file = fileInput.files[0];
+            if (!file.name.endsWith('.csv')) {
+                error.textContent = 'Please upload a CSV file.';
+                return;
+            }
+
+            Papa.parse(file, {
+                header: true,
+                complete: function(results) {
+                    const data = results.data;
+                    if (data.length === 0) {
+                        error.textContent = 'CSV is empty or invalid.';
+                        return;
+                    }
+
+                    const zip = new JSZip();
+                    data.forEach((row, index) => {
+                        // Replace placeholders in template
+                        let schema = JSON.stringify(schemaTemplate);
+                        for (const key in row) {
+                            schema = schema.replace(`{{${key}}}`, row[key] || '');
+                        }
+                        // Add to ZIP
+                        zip.file(`product_${index + 1}.json`, schema);
+                    });
+
+                    // Generate and download ZIP
+                    zip.generateAsync({ type: 'blob' }).then(function(content) {
+                        saveAs(content, 'schemas.zip');
+                        status.textContent = 'Schemas generated and downloaded as schemas.zip!';
+                    });
+                },
+                error: function(err) {
+                    error.textContent = 'Error parsing CSV: ' + err.message;
+                }
+            });
+        }
+    </script>
+</body>
+</html>
