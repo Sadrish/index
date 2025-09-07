@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Amart Furniture Schema Generator</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; background: #f4f4f4; }
+        h1 { color: #333; }
+        p { color: #555; }
+        .container { max-width: 600px; margin: auto; }
+        input, button { margin: 10px 0; width: 100%; padding: 10px; }
+        button { background: #007BFF; color: white; border: none; cursor: pointer; font-size: 16px; }
+        button:hover { background: #0056b3; }
+        #status { color: green; margin-top: 10px; }
+        #error { color: red; margin-top: 10px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Amart Furniture Schema Generator</h1>
+        <p>Upload a CSV file to generate Schema.org structured data for products.</p>
+        <input type="file" id="csvFile" accept=".csv">
+        <button onclick="generateSchemas()">Generate Schemas</button>
+        <div id="status"></div>
+        <div id="error"></div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+    <script>
+        // Template 1: Single Product
+        const template1 = [
+            {
+                "@context": "https://schema.org",
+                "@type": "Organization",
+                "name": "Amart Furniture",
+                "url": "https://www.amartfurniture.com.au/",
+                "logo": "https://www.amartfurniture.com.au/on/demandware.static/-/Library-Sites-amart-shared-library/default/dwc4568a03/images/Logos/logo.svg",
+                "sameAs": [
+                    "http://www.facebook.com/amartfurniture",
+                    "https://www.pinterest.com.au/amartfurniture/",
+                    "https://www.instagram.com/amartfurniture/",
+                    "https://www.youtube.com/user/superamart1"
+                ]
+            },
+            {
+                "@context": "https://schema.org/",
+                "@type": "WebSite",
+                "name": "Amart Furniture",
+                "url": "https://www.amartfurniture.com.au/",
+                "potentialAction": {
+                    "@type": "SearchAction",
+                    "target": "https://www.amartfurniture.com.au/search?q={search_term_string}",
+                    "query-input": "required name=search_term_string"
+                }
+            },
+            {
+                "@context": "https://schema.org/",
+                "@type": "BreadcrumbList",
+                "itemListElement": [
+                    {
+                        "@type": "ListItem",
+                        "position": 1,
+                        "name": "Amart Furniture: Shop Online & In-Store Across Australia",
+                        "item": "https://www.amartfurniture.com.au/"
+                    },
+                    {
+                        "@type": "ListItem",
+                        "position": 2,
+                        "name": "{{product_name}}",
+                        "item": "{{product_url}}"
+                    }
+                ]
+            },
+            {
+                "@context": "https://schema.org/",
+                "@type": "Product",
+                "name": "{{product_name}}",
+                "url": "{{product_url}}",
+                "image": ["{{image}}"],
+                "color": "{{color}}",
+                "sku": "{{sku}}",
+                "brand": {
+                    "@type": "Brand",
+                    "name": "{{brand_name}}"
+                },
+                "offers": {
+                    "@type": "AggregateOffer",
+                    "priceCurrency": "AUD",
+                    "lowPrice": "{{low_price}}",
+                    "highPrice": "{{high_price}}",
+                    "availability": "{{availability}}",
+                    "url": "{{product_url}}?quantity=1",
+                    "itemCondition": "https://schema.org/NewCondition",
+                    "sku": "{{sku}}",
+                    "seller": {
+                        "@type": "Organization",
+                        "name": "Amart Furniture",
+                        "url": "https://www.amartfurniture.com.au/",
+                        "logo": "https://www.amartfurniture.com.au/on/demandware.static/-/Library-Sites-amart-shared-library/default/dwc4568a03/images/Logos/logo.svg"
+                    }
+                },
+                "aggregateRating": {
+                    "@type": "AggregateRating",
+                    "ratingValue": "{{rating_value}}",
+                    "bestRating": "5",
+                    "worstRating": "5",
+                    "ratingCount": "{{rating_count}}"
+                }
+            }
+        ];
+
+        // Template 2: Product Group with Variants
+        const template2 = [
+            {
+                "@context": "https://schema.org",
+                "@type": "Organization",
+                "name": "Amart Furniture",
+                "url": "https://www.amartfurniture.com.au/",
+                "logo": "https://www.amartfurniture.com.au/on/demandware.static/-/Library-Sites-amart-shared-library/default/dwc4568a03/images/Logos/logo.svg",
+                "sameAs": [
+                    "http://www.facebook.com/amartfurniture",
+                    "https://www.pinterest.com.au/amartfurniture/",
+                    "https://www.instagram.com/amartfurniture/",
+                    "https://www.youtube.com/user/superamart1"
+                ]
+            },
+            {
+                "@context": "https://schema.org/",
+                "@type": "WebSite",
+                "name": "Amart Furniture",
+                "url": "https://www.amartfurniture.com.au/",
+                "potentialAction": {
+                    "@type": "SearchAction",
+                    "target": "https://www.amartfurniture.com.au/search?q={search_term_string}",
+                    "query-input": "required name=search_term_string"
+                }
+            },
+            {
+                "@context": "https://schema.org/",
+                "@type": "BreadcrumbList",
+                "itemListElement": [
+                    {
+                        "@type": "ListItem",
+                        "position": 1,
+                        "name": "Amart Furniture: Shop Online & In-Store Across Australia",
+                        "item": "https://www.amartfurniture.com.au/"
+                    },
+                    {
+                        "@type": "ListItem",
+                        "position": 2,
+                        "name": "{{product_name}}",
+                        "item": "{{product_url}}"
+                    }
+                ]
+            },
+            {
+                "@context": "https://schema.org",
+                "@type": "ProductGroup",
+                "name": "{{product_name}}",
+                "description": "{{description}}",
+                "category": {
+                    "@type": "DefinedTerm",
+                    "name": "{{category}}",
+                    "inDefinedTermSet": "https://www.amartfurniture.com.au/terms/"
+                },
+                "hasVariant": []
+            }
+        ];
+
+        // Variant template for Template 2
+        const variantTemplate = {
+            "@type": "Product",
+            "name": "{{product_name}}",
+            "url": "{{product_url}}?quantity=1",
+            "image": ["{{image}}"],
+            "color": "{{color}}",
+            "sku": "{{sku}}",
+            "brand": {
+                "@type": "Brand",
+                "name": "{{brand_name}}"
+            },
+            "offers": {
+                "@type": "AggregateOffer",
+                "priceCurrency": "AUD",
+                "lowPrice": "{{low_price}}",
+                "highPrice": "{{high_price}}",
+                "availability": "{{availability}}",
+                "url": "{{product_url}}?quantity=1",
+                "itemCondition": "https://schema.org/NewCondition",
+                "sku": "{{sku}}",
+                "seller": {
+                    "@type": "Organization",
+                    "name": "Amart Furniture",
+                    "url": "https://www.amartfurniture.com.au/",
+                    "logo": "https://www.amartfurniture.com.au/on/demandware.static/-/Library-Sites-amart-shared-library/default/dwc4568a03/images/Logos/logo.svg"
+                }
+            }
+        };
+
+        function generateSchemas() {
+            const fileInput = document.getElementById('csvFile');
+            const status = document.getElementById('status');
+            const error = document.getElementById('error');
+            status.textContent = '';
+            error.textContent = '';
+
+            if (!fileInput.files.length) {
+                error.textContent = 'Please select a CSV file.';
+                return;
+            }
+
+            const file = fileInput.files[0];
+            if (!file.name.endsWith('.csv')) {
+                error.textContent = 'Please upload a CSV file.';
+                return;
+            }
+
+            Papa.parse(file, {
+                header: true,
+                complete: function(results) {
+                    const data = results.data;
+                    if (data.length === 0) {
+                        error.textContent = 'CSV is empty or invalid.';
+                        return;
+                    }
+
+                    const zip = new JSZip();
+                    // Group rows by product_name for ProductGroup
+                    const groupedData = {};
+                    data.forEach(row => {
+                        if (!groupedData[row.product_name]) {
+                            groupedData[row.product_name] = [];
+                        }
+                        groupedData[row.product_name].push(row);
+                    });
+
+                    let index = 1;
+                    for (const productName in groupedData) {
+                        const rows = groupedData[productName];
+                        const firstRow = rows[0];
+                        let schema;
+
+                        if (firstRow.template_type === 'Product') {
+                            // Use Template 1 for single product
+                            schema = JSON.parse(JSON.stringify(template1));
+                            schema = JSON.stringify(schema).replace(/{{product_name}}/g, firstRow.product_name || '')
+                                .replace(/{{product_url}}/g, firstRow.product_url || '')
+                                .replace(/{{image}}/g, firstRow.image || '')
+                                .replace(/{{color}}/g, firstRow.color || '')
+                                .replace(/{{sku}}/g, firstRow.sku || '')
+                                .replace(/{{brand_name}}/g, firstRow.brand_name || '')
+                                .replace(/{{low_price}}/g, firstRow.low_price || '')
+                                .replace(/{{high_price}}/g, firstRow.high_price || '')
+                                .replace(/{{availability}}/g, firstRow.availability || '')
+                                .replace(/{{rating_value}}/g, firstRow.rating_value || '')
+                                .replace(/{{rating_count}}/g, firstRow.rating_count || '');
+                        } else if (firstRow.template_type === 'ProductGroup') {
+                            // Use Template 2 for product group
+                            schema = JSON.parse(JSON.stringify(template2));
+                            schema[3].hasVariant = rows.map(row => {
+                                let variant = JSON.parse(JSON.stringify(variantTemplate));
+                                variant = JSON.stringify(variant).replace(/{{product_name}}/g, row.product_name || '')
+                                    .replace(/{{product_url}}/g, row.product_url || '')
+                                    .replace(/{{image}}/g, row.image || '')
+                                    .replace(/{{color}}/g, row.color || '')
+                                    .replace(/{{sku}}/g, row.sku || '')
+                                    .replace(/{{brand_name}}/g, row.brand_name || '')
+                                    .replace(/{{low_price}}/g, row.low_price || '')
+                                    .replace(/{{high_price}}/g, row.high_price || '')
+                                    .replace(/{{availability}}/g, row.availability || '');
+                                return JSON.parse(variant);
+                            });
+                            schema = JSON.stringify(schema).replace(/{{product_name}}/g, firstRow.product_name || '')
+                                .replace(/{{product_url}}/g, firstRow.product_url || '')
+                                .replace(/{{description}}/g, firstRow.description || '')
+                                .replace(/{{category}}/g, firstRow.category || '');
+                        } else {
+                            error.textContent = `Invalid template_type for ${productName}. Use "Product" or "ProductGroup".`;
+                            return;
+                        }
+
+                        zip.file(`schema_${index}.json`, `<script type="application/ld+json">\n${schema}\n</script>`);
+                        index++;
+                    }
+
+                    // Generate and download ZIP
+                    zip.generateAsync({ type: 'blob' }).then(function(content) {
+                        saveAs(content, 'schemas.zip');
+                        status.textContent = `Generated ${index - 1} schemas. Downloaded as schemas.zip!`;
+                    });
+                },
+                error: function(err) {
+                    error.textContent = 'Error parsing CSV: ' + err.message;
+                }
+            });
+        }
+    </script>
+</body>
+</html>
