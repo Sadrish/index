@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>AI, SEO, LLM & GEO Glossary | Definitions, Examples & Quiz Mode</title>
+  <style>
+    :root{
+      --bg:#0b1020; --card:#121a2f; --muted:#9fb0c2; --text:#eaf1ff; --accent:#6ee7ff; --accent2:#a78bfa; --border:#223055;
+    }
+    html,body{height:100%}
+    body{margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;background:linear-gradient(180deg,#0b1020, #121a2f 30%, #0b1020 100%);color:var(--text)}
+    .container{max-width:1100px;margin:0 auto;padding:24px}
+    header{display:flex;gap:16px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+    h1{font-size:clamp(22px,3.2vw,34px);margin:0;letter-spacing:.3px}
+    .sub{color:var(--muted);font-size:14px}
+    .controls{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-top:14px}
+    .search{flex:1 1 280px;display:flex;align-items:center;border:1px solid var(--border);background:rgba(255,255,255,.02);border-radius:12px;padding:10px 12px}
+    .search input{all:unset;flex:1;font-size:14px;color:var(--text)}
+    .btn{border:1px solid var(--border);background:rgba(255,255,255,.03);color:var(--text);padding:10px 12px;border-radius:12px;cursor:pointer;user-select:none;transition:.2s}
+    .btn:hover{transform:translateY(-1px);border-color:#2f4377}
+    .btn[aria-pressed="true"]{outline:2px solid var(--accent);}
+    .chiprow{display:flex;gap:6px;overflow:auto;padding-bottom:4px;margin-top:8px}
+    .chip{font-size:12px;border:1px solid var(--border);padding:6px 8px;border-radius:10px;color:var(--muted);cursor:pointer;white-space:nowrap;background:rgba(255,255,255,.02)}
+    .chip.active{color:var(--text);border-color:var(--accent);}    
+    .grid{display:grid;grid-template-columns:repeat(1,minmax(0,1fr));gap:14px;margin-top:16px}
+    @media (min-width:600px){.grid{grid-template-columns:repeat(2,1fr)}}
+    @media (min-width:900px){.grid{grid-template-columns:repeat(3,1fr)}}
+
+    .card{background:linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.02));border:1px solid var(--border);border-radius:16px;padding:14px 14px 12px;display:flex;flex-direction:column;gap:8px;min-height:130px;position:relative}
+    .term{font-weight:700;letter-spacing:.2px;line-height:1.25}
+    .def{color:var(--muted);font-size:14px;line-height:1.35}
+    .card .open{margin-top:auto;align-self:flex-start}
+    .pill{font-size:11px;color:#d1e8ff;background:linear-gradient(90deg,rgba(110,231,255,.15),rgba(167,139,250,.12));border:1px solid var(--border);padding:4px 7px;border-radius:999px}
+    .list .grid{grid-template-columns:1fr}
+    .list .def{display:block}
+    footer{opacity:.85;color:var(--muted);text-align:center;margin:22px 0}
+    dialog{width:min(720px,96vw);background:var(--card);border:1px solid var(--border);border-radius:16px;color:var(--text);padding:0;max-height:90vh;overflow:auto}
+    dialog::backdrop{background:rgba(7,10,22,.6)}
+    .modal-header{display:flex;gap:12px;align-items:center;justify-content:space-between;padding:16px 18px;border-bottom:1px solid var(--border)}
+    .modal-body{padding:18px}
+    .actions{display:flex;gap:8px}
+    .quiz{margin-top:16px;border:1px dashed #2a3a68;border-radius:14px;padding:14px;display:none}
+    .quiz.active{display:block}
+    .kbd{font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;border:1px solid var(--border);border-bottom-width:3px;background:rgba(255,255,255,.03);border-radius:8px;padding:2px 6px;font-size:12px}
+    .hidden{display:none}
+    .muted{color:var(--muted)}
+    .row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+  </style>
+</head>
+<body>
+  <div class="container" id="app">
+    <header>
+      <div>
+        <h1>Comprehensive Glossaries for AI, SEO, LLMs, and GEO</h1>
+        
+<div class="sub">
+   Explore an organized, easy-to-navigate collection of essential terms and definitions 
+   across Artificial Intelligence (AI), Search Engine Optimization (SEO), Large Language Models (LLMs), 
+   and Generative Engine Optimization (GEO). <br><br>
+  
+   Features include: A–Z filtering for quick access to terms, Detailed modal pop-ups for in-depth explanations and examples, Interactive Quiz Mode to test and reinforce your knowledge, & Continuous updates with the latest industry vocabulary and trends  
+</div>
+      </div>
+      <div class="row">
+        <button class="btn" id="toggleViewBtn" aria-pressed="false" title="Toggle list/grid view">Toggle View</button>
+        <button class="btn" id="quizBtn" aria-pressed="false" title="Practice with flashcards">Quiz Mode</button>
+      </div>
+    </header>
+
+    <div class="controls">
+      <label class="search" aria-label="Search terms">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="opacity:.7;margin-right:8px"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+        <input id="search" placeholder="Search term or definition…" autocomplete="off" />
+        <kbd class="kbd" title="Press to clear" id="clearKbd">Esc</kbd>
+      </label>
+      <div class="chiprow" id="az"></div>
+    </div>
+
+    <section id="quiz" class="quiz" aria-live="polite">
+      <div class="row" style="justify-content:space-between">
+        <div>
+          <div class="pill" id="quizCounter">1 / 1</div>
+          <h3 id="quizTerm" class="term" style="margin:.4rem 0 0"></h3>
+        </div>
+        <div class="row">
+          <button class="btn" id="reveal">Reveal</button>
+          <button class="btn" id="next">Next</button>
+          <button class="btn" id="shuffle">Shuffle</button>
+        </div>
+      </div>
+      <p id="quizDef" class="def muted" style="margin-top:8px"></p>
+    </section>
+
+    <!-- Pre-rendered GRID (all cards are in the HTML for instant mobile display) -->
+    <main class="grid" id="grid" role="list">
+      
+      <!-- Original terms -->
+      <article class="card" role="listitem" data-term="10 Blue Links" data-letter="1"><div class="pill">1</div><div class="term">10 Blue Links</div><div class="def">The original, simple format of Google's search results page, displaying ten clickable hyperlinks in a vertical stack.</div><button class="btn open">Open</button></article>
+      <article class="card" role="listitem" data-term="0-Click Results" data-letter="0"><div class="pill">0</div><div class="term">0-Click Results</div><div class="def">Search engine results where the user's query is answered directly on the SERP, eliminating the need to click on any external links.</div><button class="btn open">Open</button></article>
+      <article class="card" role="listitem" data-term="AI Search" data-letter="A"><div class="pill">A</div><div class="term">AI Search</div><div class="def">The evolution of search engines to incorporate artificial intelligence, particularly generative AI, to understand queries, synthesize information, and provide direct answers.</div><button class="btn open">Open</button></article>
+      <article class="card" role="listitem" data-term="Answer Engine Optimization (AEO)" data-letter="A"><div class="pill">A</div><div class="term">Answer Engine Optimization (AEO)</div><div class="def">An alternative term proposed for optimizing content for search engines that provide direct answers, rather than just links.</div><button class="btn open">Open</button></article>
+      <article class="card" role="listitem" data-term="Answer Surface" data-letter="A"><div class="pill">A</div><div class="term">Answer Surface</div><div class="def">The transformed Search Engine Results Page (SERP) that provides direct answers, summaries, and various information elements, rather than just a list of links.</div><button class="btn open">Open</button></article>
+      <article class="card" role="listitem" data-term="BERT (Bidirectional Encoder Representations from Transformers)" data-letter="B"><div class="pill">B</div><div class="term">BERT (Bidirectional Encoder Representations from Transformers)</div><div class="def">A breakthrough transformer model (2018) that helped Google understand the context of words in a sentence, not just their individual keywords.</div><button class="btn open">Open</button></article>
+      <article class="card" role="listitem" data-term="Cognitive Costs" data-letter="C"><div class="pill">C</div><div class="term">Cognitive Costs</div><div class="def">The mental effort required by users to formulate search queries and analyze the presented search results.</div><button class="btn open">Open</button></article>
+      <article class="card" role="listitem" data-term="Content Resonance" data-letter="C"><div class="pill">C</div><div class="term">Content Resonance</div><div class="def">Turning search visibility (via Relevance Engineering) into a lasting connection with the audience.</div><button class="btn open">Open</button></article>
+      <article class="card" role="listitem" data-term="Entity" data-letter="E"><div class="pill">E</div><div class="term">Entity</div><div class="def">A distinct, well-defined thing or concept (e.g., a person, place, organization, or idea) that search engines can understand and connect through a Knowledge Graph.</div><button class="btn open">Open</button></article>
+      <article class="card" role="listitem" data-term="Featured Snippets" data-letter="F"><div class="pill">F</div><div class="term">Featured Snippets</div><div class="def">Answer boxes pulled directly from website content and displayed at the top of Google's search results to provide quick answers.</div><button class="btn open">Open</button></article>
+      <article class="card" role="listitem" data-term="Generative AI" data-letter="G"><div class="pill">G</div><div class="term">Generative AI</div><div class="def">AI models, such as large language models (LLMs), that can generate new content, including text, images, or code, based on prompts and data.</div><button class="btn open">Open</button></article>
+      <article class="card" role="listitem" data-term="Generative Engine Optimization (GEO)" data-letter="G"><div class="pill">G</div><div class="term">Generative Engine Optimization (GEO)</div><div class="def">Optimizing content, data structures, and authority signals specifically for generative engines to understand, extract, and present information as part of an AI-generated answer.</div><button class="btn open">Open</button></article>
+      <article class="card" role="listitem" data-term="Knowledge Graph (2012)" data-letter="K"><div class="pill">K</div><div class="term">Knowledge Graph (2012)</div><div class="def">Google's semantic information network that shifted its understanding from matching words to understanding entities and concepts, displaying facts directly on the SERP.</div><button class="btn open">Open</button></article>
+      <article class="card" role="listitem" data-term="Large Language Models (LLMs)" data-letter="L"><div class="pill">L</div><div class="term">Large Language Models (LLMs)</div><div class="def">Advanced AI models (e.g., GPT, Gemini, Claude) capable of processing and generating human-like text, forming the basis of conversational AI search.</div><button class="btn open">Open</button></article>
+      <article class="card" role="listitem" data-term="Latent Intent" data-letter="L"><div class="pill">L</div><div class="term">Latent Intent</div><div class="def">The underlying, unspoken purpose behind a user's search query, which AI systems aim to uncover beyond explicit keywords.</div><button class="btn open">Open</button></article>
+      <article class="card" role="listitem" data-term="Lexical Search" data-letter="L"><div class="pill">L</div><div class="term">Lexical Search</div><div class="def">Traditional search relying on matching keywords in a query to keywords in documents.</div><button class="btn open">Open</button></article>
+      <article class="card" role="listitem" data-term="Model Context Protocol (MCP)" data-letter="M"><div class="pill">M</div><div class="term">Model Context Protocol (MCP)</div><div class="def">A system that transforms static content into dynamic, actionable AI experiences, enabling primary AI agents to spawn multiple specialized agents for complex tasks.</div><button class="btn open">Open</button></article>
+      <article class="card" role="listitem" data-term="MUM (Multitask Unified Model) & PaLM (Pathways Language Model) (2021–2022)" data-letter="M"><div class="pill">M</div><div class="term">MUM (Multitask Unified Model) & PaLM (Pathways Language Model) (2021–2022)</div><div class="def">Advanced Google AI models that enable processing of multimedia and complex queries in a single step.</div><button class="btn open">Open</button></article>
+      <article class="card" role="listitem" data-term="Neural Search" data-letter="N"><div class="pill">N</div><div class="term">Neural Search</div><div class="def">Search leveraging neural networks and machine learning to understand meaning and context, beyond lexical matching.</div><button class="btn open">Open</button></article>
+      <article class="card" role="listitem" data-term="Query Fan-Out" data-letter="Q"><div class="pill">Q</div><div class="term">Query Fan-Out</div><div class="def">A single query is expanded or interpreted in multiple ways to explore related intents and retrieve a broader set of information.</div><button class="btn open">Open</button></article>
+      <article class="card" role="listitem" data-term="Relevance Engineering" data-letter="R"><div class="pill">R</div><div class="term">Relevance Engineering</div><div class="def">A channel-agnostic, multidisciplinary approach that positions content within information systems to deliver highly pertinent results, focusing on context, intent, and data relationships.</div><button class="btn open">Open</button></article>
+      <article class="card" role="listitem" data-term="Retrieval-Augmented Generation (RAG)" data-letter="R"><div class="pill">R</div><div class="term">Retrieval-Augmented Generation (RAG)</div><div class="def">Combines retrieving relevant, up-to-date information from external sources with a generative model to synthesize that information into a human-readable answer.</div><button class="btn open">Open</button></article>
+      <article class="card" role="listitem" data-term="Semantic Clarity" data-letter="S"><div class="pill">S</div><div class="term">Semantic Clarity</div><div class="def">Content that is unambiguous, well-structured, and aligned with concepts that AI models can easily recognize and understand.</div><button class="btn open">Open</button></article>
+      <article class="card" role="listitem" data-term="Semantic Clustering" data-letter="S"><div class="pill">S</div><div class="term">Semantic Clustering</div><div class="def">Grouping related content or entities based on meaning rather than just keywords, crucial for AI models to understand topical relevance.</div><button class="btn open">Open</button></article>
+      <article class="card" role="listitem" data-term="Semantic Search" data-letter="S"><div class="pill">S</div><div class="term">Semantic Search</div><div class="def">Search that goes beyond keyword matching to understand the meaning and context of a user's query and the content, often using vector embeddings.</div><button class="btn open">Open</button></article>
+      <article class="card" role="listitem" data-term="Search Engine Optimization (SEO)" data-letter="S"><div class="pill">S</div><div class="term">Search Engine Optimization (SEO)</div><div class="def">Improving the visibility of a website or web page in unpaid results, traditionally focused on ranking for specific keywords.</div><button class="btn open">Open</button></article>
+      <article class="card" role="listitem" data-term="Search Engine Results Page (SERP)" data-letter="S"><div class="pill">S</div><div class="term">Search Engine Results Page (SERP)</div><div class="def">The page displayed by a search engine in response to a user's query.</div><button class="btn open">Open</button></article>
+      <article class="card" role="listitem" data-term="Structured Data" data-letter="S"><div class="pill">S</div><div class="term">Structured Data</div><div class="def">Standardized formats for providing information about a webpage, helping search engines understand its content more effectively (e.g., Schema.org).</div><button class="btn open">Open</button></article>
+      <article class="card" role="listitem" data-term="Universal Search (2007)" data-letter="U"><div class="pill">U</div><div class="term">Universal Search (2007)</div><div class="def">Google's integration of various content types (images, news, videos) into a single search results page.</div><button class="btn open">Open</button></article>
+      <article class="card" role="listitem" data-term="Vector Embeddings" data-letter="V"><div class="pill">V</div><div class="term">Vector Embeddings</div><div class="def">Numerical representations of words, phrases, or documents in multi-dimensional space, where distance reflects semantic similarity; used in semantic search.</div><button class="btn open">Open</button></article>
+      <article class="card" role="listitem" data-term="Zero-Click AI Overviews" data-letter="Z"><div class="pill">Z</div><div class="term">Zero-Click AI Overviews</div><div class="def">AI-generated summaries or answers presented directly on the SERP, often without a traditional link to the source, fulfilling the user's intent without a click.</div><button class="btn open">Open</button></article>
+
+      <!-- New items (deduped) -->
+      <article class="card" role="listitem" data-term="AI Overviews" data-letter="A"><div class="pill">A</div><div class="term">AI Overviews</div><div class="def">Synthesized, AI-generated summaries shown directly in search results to fulfill a query without a click-through.</div><button class="btn open">Open</button></article>
+      <article class="card" role="listitem" data-term="AI Mode" data-letter="A"><div class="pill">A</div><div class="term">AI Mode</div><div class="def">Google's dedicated AI-powered search experience, leveraging Gemini and personal context to provide conversational, personalized responses.</div><button class="btn open">Open</button></article>
+      <article class="card" role="listitem" data-term="Automation Bias" data-letter="A"><div class="pill">A</div><div class="term">Automation Bias</div><div class="def">The tendency to accept AI output without sufficient scrutiny, especially when delivered confidently in natural language.</div><button class="btn open">Open</button></article>
+      <article class="card" role="listitem" data-term="Conversational Search" data-letter="C"><div class="pill">C</div><div class="term">Conversational Search</div><div class="def">Information retrieval that mimics dialogue, allowing complex questions, multi-turn interactions, and iterative refinement.</div><button class="btn open">Open</button></article>
+      <article class="card" role="listitem" data-term="Context Retention" data-letter="C"><div class="pill">C</div><div class="term">Context Retention</div><div class="def">An AI system's ability to remember prior information and user interests within a session (and sometimes across sessions) to tailor responses.</div><button class="btn open">Open</button></article>
+      <article class="card" role="listitem" data-term="Click-Through Rate (CTR)" data-letter="C"><div class="pill">C</div><div class="term">Click-Through Rate (CTR)</div><div class="def">The percentage of users who click a result after viewing it; observed to decline for traditional organic listings in the generative era.</div><button class="btn open">Open</button></article>
+      <article class="card" role="listitem" data-term="Hallucinations" data-letter="H"><div class="pill">H</div><div class="term">Hallucinations</div><div class="def">Inaccurate or fabricated information presented by generative AI as factual, raising trust and verification concerns.</div><button class="btn open">Open</button></article>
+      <article class="card" role="listitem" data-term="Iterative Discovery / Multi-turn Search" data-letter="I"><div class="pill">I</div><div class="term">Iterative Discovery / Multi-turn Search</div><div class="def">A search process involving back-and-forth with an AI, progressively clarifying and expanding the original query over multiple turns.</div><button class="btn open">Open</button></article>
+      <article class="card" role="listitem" data-term="Keywordese" data-letter="K"><div class="pill">K</div><div class="term">Keywordese</div><div class="def">The habit of issuing short, disconnected keyword strings; trained by old search interfaces but less effective for generative AI.</div><button class="btn open">Open</button></article>
+      <article class="card" role="listitem" data-term="Messy Middle" data-letter="M"><div class="pill">M</div><div class="term">Messy Middle</div><div class="def">Google's concept (2020) for the non-linear decision journey of gathering, filtering, and comparing before a choice; AI condenses this loop.</div><button class="btn open">Open</button></article>
+      <article class="card" role="listitem" data-term="Natural Language Understanding (NLU)" data-letter="N"><div class="pill">N</div><div class="term">Natural Language Understanding (NLU)</div><div class="def">A subfield of AI enabling machines to comprehend and generate human language for complex, conversational queries.</div><button class="btn open">Open</button></article>
+      <article class="card" role="listitem" data-term="Prompt Fluency" data-letter="P"><div class="pill">P</div><div class="term">Prompt Fluency</div><div class="def">Skill of crafting precise, context-rich prompts to elicit accurate and tailored responses — the "new search literacy."</div><button class="btn open">Open</button></article>
+      <article class="card" role="listitem" data-term="Quality Click" data-letter="Q"><div class="pill">Q</div><div class="term">Quality Click</div><div class="def">A Google metric for clicks where the user does not quickly return to the results page, indicating deeper engagement or higher intent.</div><button class="btn open">Open</button></article>
+      <article class="card" role="listitem" data-term="Session Memory" data-letter="S"><div class="pill">S</div><div class="term">Session Memory</div><div class="def">Temporary or persistent storage of prior turns in an AI conversation, enabling coherent follow-ups without re-specifying context.</div><button class="btn open">Open</button></article>
+      <article class="card" role="listitem" data-term="Synthesized Answers" data-letter="S"><div class="pill">S</div><div class="term">Synthesized Answers</div><div class="def">Direct, consolidated responses provided by AI, drawn from multiple sources and presented concisely, reducing the need to click external links.</div><button class="btn open">Open</button></article>
+      <article class="card" role="listitem" data-term="Turn (in AI Search)" data-letter="T"><div class="pill">T</div><div class="term">Turn (in AI Search)</div><div class="def">A single back‑and‑forth exchange: a user's prompt and the AI's follow‑up answer.</div><button class="btn open">Open</button></article>
+      <article class="card" role="listitem" data-term="User Embeddings" data-letter="U"><div class="pill">U</div><div class="term">User Embeddings</div><div class="def">Vector representations of a user's preferences and behavior that evolve with interactions and power personalization.</div><button class="btn open">Open</button></article>
+      <article class="card" role="listitem" data-term="Zero-Click Searches" data-letter="Z"><div class="pill">Z</div><div class="term">Zero-Click Searches</div><div class="def">Queries where the answer appears on the results page (e.g., AI Overview, rich snippet), so the user doesn’t click through.</div><button class="btn open">Open</button></article>
+      <article class="card" role="listitem" data-term="N-gram Matching" data-letter="N"><div class="pill">N</div><div class="term">N-gram Matching</div><div class="def">Breaking queries into terms/sequences and matching exact strings against indexes, without semantic context.</div><button class="btn open">Open</button></article>
+      <article class="card" role="listitem" data-term="Intent Classification" data-letter="I"><div class="pill">I</div><div class="term">Intent Classification</div><div class="def">Mapping a query to the user's underlying goal or purpose, not just the words typed.</div><button class="btn open">Open</button></article>
+      <article class="card" role="listitem" data-term="Broder's Taxonomy" data-letter="B"><div class="pill">B</div><div class="term">Broder's Taxonomy</div><div class="def">A framework (early 2000s) classifying intents as Informational, Navigational, or Transactional.</div><button class="btn open">Open</button></article>
+      <article class="card" role="listitem" data-term="Natural Language Processing (NLP)" data-letter="N"><div class="pill">N</div><div class="term">Natural Language Processing (NLP)</div><div class="def">AI field enabling machines to parse and generate language; fundamental to full‑sentence, context‑rich query handling.</div><button class="btn open">Open</button></article>
+      <article class="card" role="listitem" data-term="Hummingbird Update (2013)" data-letter="H"><div class="pill">H</div><div class="term">Hummingbird Update (2013)</div><div class="def">A major Google algorithm update that improved understanding of query meaning using NLP, beyond keyword matching.</div><button class="btn open">Open</button></article>
+      <article class="card" role="listitem" data-term="RankBrain & BERT" data-letter="R"><div class="pill">R</div><div class="term">RankBrain & BERT</div><div class="def">Google ML models introduced to better interpret long‑tail and complex natural language queries, improving relevance.</div><button class="btn open">Open</button></article>
+      <article class="card" role="listitem" data-term="Zero-Click Exposure" data-letter="Z"><div class="pill">Z</div><div class="term">Zero-Click Exposure</div><div class="def">Answers displayed directly on the SERP (e.g., Knowledge Graph, Featured Snippets), removing the need to click to a site.</div><button class="btn open">Open</button></article>
+      <article class="card" role="listitem" data-term="Multi-Turn Interactions" data-letter="M"><div class="pill">M</div><div class="term">Multi-Turn Interactions</div><div class="def">Conversational experiences where the system remembers previous questions and carries context forward for follow‑ups.</div><button class="btn open">Open</button></article>
+      <article class="card" role="listitem" data-term="Intent Orchestration" data-letter="I"><div class="pill">I</div><div class="term">Intent Orchestration</div><div class="def">An AI search stage where the system predicts and acts on multiple evolving intents using history, profile, and real‑time data.</div><button class="btn open">Open</button></article>
+      <article class="card" role="listitem" data-term="Proactive Agents" data-letter="P"><div class="pill">P</div><div class="term">Proactive Agents</div><div class="def">AI systems that detect latent needs from behavior and context, initiating assistance without an explicit prompt.</div><button class="btn open">Open</button></article>
+      <article class="card" role="listitem" data-term="Prompt Inversion" data-letter="P"><div class="pill">P</div><div class="term">Prompt Inversion</div><div class="def">When an AI asks clarifying questions to gather necessary context, refining the task and improving results.</div><button class="btn open">Open</button></article>
+      <article class="card" role="listitem" data-term="Subqueries" data-letter="S"><div class="pill">S</div><div class="term">Subqueries</div><div class="def">Internal discrete searches generated by an AI by splitting a complex query into its specific aspects.</div><button class="btn open">Open</button></article>
+      <article class="card" role="listitem" data-term="Passage Retrieval" data-letter="P"><div class="pill">P</div><div class="term">Passage Retrieval</div><div class="def">Finding the most relevant short passages within documents rather than evaluating entire pages, to form answers.</div><button class="btn open">Open</button></article>
+      <article class="card" role="listitem" data-term="Query Rewriting" data-letter="Q"><div class="pill">Q</div><div class="term">Query Rewriting</div><div class="def">AI reformulates or expands a user query internally (e.g., with synonyms) to better match retrieval indexes and improve results.</div><button class="btn open">Open</button></article>
+      <article class="card" role="listitem" data-term="UX for Humans (User Experience)" data-letter="U"><div class="pill">U</div><div class="term">UX for Humans (User Experience)</div><div class="def">Design that is intuitive, visually clear, and emotionally engaging for people consuming content.</div><button class="btn open">Open</button></article>
+      <article class="card" role="listitem" data-term="AX for Agents (Agent Experience)" data-letter="A"><div class="pill">A</div><div class="term">AX for Agents (Agent Experience)</div><div class="def">Design that structures content with explicit entities and machine‑readable scaffolding so AI can parse and act on it.</div><button class="btn open">Open</button></article>
+      <article class="card" role="listitem" data-term="Structural Duality" data-letter="S"><div class="pill">S</div><div class="term">Structural Duality</div><div class="def">Creating content optimized simultaneously for human UX and machine AX, in one artifact.</div><button class="btn open">Open</button></article>
+      <article class="card" role="listitem" data-term="AI Mode (Google)" data-letter="A"><div class="pill">A</div><div class="term">AI Mode (Google)</div><div class="def">A Google search experience (rolling out 2025) where the interaction is AI‑first and conversational by default.</div><button class="btn open">Open</button></article>
+      <article class="card" role="listitem" data-term="AI Overviews (Google)" data-letter="A"><div class="pill">A</div><div class="term">AI Overviews (Google)</div><div class="def">AI‑generated summaries launched in 2024 that appear at the top of Google results, synthesizing content into direct answers.</div><button class="btn open">Open</button></article>
+      <article class="card" role="listitem" data-term="Anthropic (Claude)" data-letter="A"><div class="pill">A</div><div class="term">Anthropic (Claude)</div><div class="def">A leading generative AI company focused on safety and alignment; Claude powers conversational discovery across many tools.</div><button class="btn open">Open</button></article>
+      <article class="card" role="listitem" data-term="API-Based Access" data-letter="A"><div class="pill">A</div><div class="term">API-Based Access</div><div class="def">Platforms give AI structured access to content via APIs/data partnerships, offering more control to providers than crawling.</div><button class="btn open">Open</button></article>
+      <article class="card" role="listitem" data-term="ChatGPT (OpenAI)" data-letter="C"><div class="pill">C</div><div class="term">ChatGPT (OpenAI)</div><div class="def">A mainstream generative AI system (launched 2022) for knowledge, creation, coding, and live search in an interactive chat UX.</div><button class="btn open">Open</button></article>
+      <article class="card" role="listitem" data-term="Copilot (Microsoft)" data-letter="C"><div class="pill">C</div><div class="term">Copilot (Microsoft)</div><div class="def">Microsoft's generative AI integrated into Bing, Microsoft 365, and Windows, offering conversational answers and task automation.</div><button class="btn open">Open</button></article>
+      <article class="card" role="listitem" data-term="Crawl-Based Discovery" data-letter="C"><div class="pill">C</div><div class="term">Crawl-Based Discovery</div><div class="def">Traditional discovery via bots crawling public pages; provides reach without direct submission but less control to creators.</div><button class="btn open">Open</button></article>
+      <article class="card" role="listitem" data-term="Gemini (Google)" data-letter="G"><div class="pill">G</div><div class="term">Gemini (Google)</div><div class="def">Google's family of generative models powering many search and assistant features; positioned as the future of Google Search.</div><button class="btn open">Open</button></article>
+      <article class="card" role="listitem" data-term="Great Decoupling" data-letter="G"><div class="pill">G</div><div class="term">Great Decoupling</div><div class="def">AI answers appear directly on the SERP, reducing the need to visit external sites and decoupling answers from clicks.</div><button class="btn open">Open</button></article>
+      <article class="card" role="listitem" data-term="Perplexity" data-letter="P"><div class="pill">P</div><div class="term">Perplexity</div><div class="def">An answer engine noted for transparent citations, real‑time retrieval, and emphasis on credible sources.</div><button class="btn open">Open</button></article>
+      <article class="card" role="listitem" data-term="AI Search Manual" data-letter="A"><div class="pill">A</div><div class="term">AI Search Manual</div><div class="def">A comprehensive guide for appearing in the next iteration of organic search, where answers are generated (not just linked).</div><button class="btn open">Open</button></article>
+      <article class="card" role="listitem" data-term="Full Stack (Operation)" data-letter="F"><div class="pill">F</div><div class="term">Full Stack (Operation)</div><div class="def">Google's control across data, hardware, research, infrastructure, distribution, and user behavior in its AI ecosystem.</div><button class="btn open">Open</button></article>
+      <article class="card" role="listitem" data-term="Recurrent Neural Networks (RNNs)" data-letter="R"><div class="pill">R</div><div class="term">Recurrent Neural Networks (RNNs)</div><div class="def">An older neural architecture for sequential data, now largely superseded by Transformers for language tasks.</div><button class="btn open">Open</button></article>
+      <article class="card" role="listitem" data-term="Long Short-Term Memory networks (LSTMs)" data-letter="L"><div class="pill">L</div><div class="term">Long Short-Term Memory networks (LSTMs)</div><div class="def">A type of recurrent neural network able to learn longer dependencies; often replaced by Transformers in modern NLP.</div><button class="btn open">Open</button></article>
+      <article class="card" role="listitem" data-term="Proprietary Data" data-letter="P"><div class="pill">P</div><div class="term">Proprietary Data</div><div class="def">Data exclusively owned and collected by a company (e.g., Google's product telemetry) that confers unique advantages.</div><button class="btn open">Open</button></article>
+      <article class="card" role="listitem" data-term="Source Aggregation" data-letter="S"><div class="pill">S</div><div class="term">Source Aggregation</div><div class="def">Collecting and combining information from multiple sources to construct a comprehensive AI‑generated answer.</div><button class="btn open">Open</button></article>
+      <article class="card" role="listitem" data-term="Tensor Processing Units (TPUs)" data-letter="T"><div class="pill">T</div><div class="term">Tensor Processing Units (TPUs)</div><div class="def">Custom chips from Google designed to accelerate deep learning training and inference workloads.</div><button class="btn open">Open</button></article>
+      <article class="card" role="listitem" data-term="Transformer Architecture" data-letter="T"><div class="pill">T</div><div class="term">Transformer Architecture</div><div class="def">The 2017 neural architecture ("Attention Is All You Need") underpinning most modern LLMs via efficient long‑range attention and scalability.</div><button class="btn open">Open</button></article>
+    </main>
+
+    <footer>
+      <small>Tip: type to search, <span class="kbd">Esc</span> to clear, <span class="kbd">Enter</span> to open the first result. Works without JavaScript — JS only enhances it.</small>
+    </footer>
+  </div>
+
+  <!-- Detail Modal -->
+  <dialog id="modal" aria-labelledby="modalTitle">
+    <div class="modal-header">
+      <h3 id="modalTitle" class="term" style="margin:0"></h3>
+      <div class="actions">
+        <button class="btn" id="copyLink">Copy Link</button>
+        <button class="btn" id="closeModal" autofocus>Close</button>
+      </div>
+    </div>
+    <div class="modal-body">
+      <p id="modalDef" class="def" style="font-size:15px"></p>
+    </div>
+  </dialog>
+
+  <script>
+    // Enhance: work from pre-rendered DOM, so the list shows even if JS is blocked.
+    const els = {
+      grid: document.getElementById('grid'),
+      search: document.getElementById('search'),
+      az: document.getElementById('az'),
+      toggleViewBtn: document.getElementById('toggleViewBtn'),
+      quizBtn: document.getElementById('quizBtn'),
+      quiz: document.getElementById('quiz'),
+      quizTerm: document.getElementById('quizTerm'),
+      quizDef: document.getElementById('quizDef'),
+      quizCounter: document.getElementById('quizCounter'),
+      reveal: document.getElementById('reveal'),
+      next: document.getElementById('next'),
+      shuffle: document.getElementById('shuffle'),
+      modal: document.getElementById('modal'),
+      modalTitle: document.getElementById('modalTitle'),
+      modalDef: document.getElementById('modalDef'),
+      copyLink: document.getElementById('copyLink'),
+      clearKbd: document.getElementById('clearKbd'),
+    };
+
+    const cards = [...els.grid.querySelectorAll('.card')];
+    const DATA = cards.map(c=>({
+      term: c.getAttribute('data-term'),
+      def: c.querySelector('.def').textContent,
+      letter: c.getAttribute('data-letter') || c.getAttribute('data-term').charAt(0).toUpperCase()
+    }));
+
+    const slug = s => s.toLowerCase().replace(/&/g,' and ').replace(/[^a-z0-9+ ]+/g,'').trim().replace(/\s+/g,'-');
+
+    // Build A–Z chips
+    const letters = ['All',...Array.from({length:26},(_,i)=>String.fromCharCode(65+i)), '0-9'];
+    letters.forEach(l=>{
+      const b = document.createElement('button');
+      b.className='chip'; b.textContent=l; b.dataset.letter = l==='All'?'':l;
+      b.addEventListener('click',()=>{ state.letter=b.dataset.letter; updateAZ(); filterRender(); });
+      els.az.appendChild(b);
+    });
+    function updateAZ(){
+      [...els.az.children].forEach(ch=> ch.classList.toggle('active', ch.dataset.letter===state.letter));
+    }
+
+    let state = { q: '', letter: '', view: 'grid', quizIdx: 0, quizOrder: [] };
+
+    // Attach open handlers to each card
+    cards.forEach(c=>{
+      const openBtn = c.querySelector('.open');
+      const term = c.getAttribute('data-term');
+      const def = c.querySelector('.def').textContent;
+      const open = ()=> openModal({term, def});
+      openBtn.addEventListener('click', open);
+      c.addEventListener('keydown', e=>{ if(e.key==='Enter') open(); });
+      c.tabIndex = 0;
+    });
+
+    function openModal(item){
+      els.modalTitle.textContent = item.term;
+      els.modalDef.textContent = item.def;
+      els.copyLink.onclick = () => {
+        const url = location.origin + location.pathname + '#' + slug(item.term);
+        navigator.clipboard.writeText(url).then(()=>{
+          els.copyLink.textContent='Copied!';
+          setTimeout(()=> els.copyLink.textContent='Copy Link', 900);
+        });
+      };
+      els.modal.showModal();
+      location.hash = slug(item.term);
+    }
+
+    function handleHash(){
+      const h = decodeURIComponent(location.hash.replace('#',''));
+      if(!h) return;
+      const match = DATA.find(d=> slug(d.term)===h);
+      if(match) openModal(match);
+    }
+
+    // Filtering (show/hide existing cards)
+    function filterRender(){
+      const q = state.q.trim().toLowerCase();
+      cards.forEach(c=>{
+        const term = c.getAttribute('data-term');
+        const def = c.querySelector('.def').textContent;
+        const first = term.charAt(0).toUpperCase();
+        let ok = true;
+        if(state.letter){
+          if(state.letter==='0-9') ok = /[^A-Za-z]/.test(first);
+          else ok = first===state.letter;
+        }
+        if(q){ ok = ok && (term.toLowerCase().includes(q) || def.toLowerCase().includes(q)); }
+        c.style.display = ok ? '' : 'none';
+      });
+      document.getElementById('app').classList.toggle('list', state.view==='list');
+    }
+
+    // Quiz
+    function shuffleOrder(){ state.quizOrder = DATA.map((_,i)=>i).sort(()=>Math.random()-.5); state.quizIdx=0; }
+    function showQuiz(){
+      if(state.quizOrder.length===0) shuffleOrder();
+      const i = state.quizOrder[state.quizIdx % state.quizOrder.length];
+      const item = DATA[i];
+      els.quizTerm.textContent = item.term;
+      els.quizDef.textContent = item.def;
+      els.quizDef.classList.add('hidden');
+      els.quizCounter.textContent = `${(state.quizIdx%state.quizOrder.length)+1} / ${state.quizOrder.length}`;
+    }
+
+    // Events
+    els.search.addEventListener('input', e=>{ state.q = e.target.value; filterRender(); });
+    els.clearKbd.addEventListener('click', ()=>{ els.search.value=''; state.q=''; filterRender(); });
+    document.addEventListener('keydown', e=>{
+      if(e.key==='Escape'){ els.search.value=''; state.q=''; filterRender(); }
+      if(e.key==='Enter'){
+        const firstBtn = els.grid.querySelector('.card:not([style*="display: none"]) .open');
+        if(firstBtn) firstBtn.click();
+      }
+    });
+    document.getElementById('closeModal').addEventListener('click', ()=> els.modal.close());
+    els.modal.addEventListener('close', ()=>{ if(location.hash) history.replaceState(null,'',location.pathname); });
+
+    els.toggleViewBtn.addEventListener('click', ()=>{
+      state.view = state.view==='grid' ? 'list' : 'grid';
+      els.toggleViewBtn.setAttribute('aria-pressed', String(state.view==='list'));
+      filterRender();
+    });
+    els.quizBtn.addEventListener('click', ()=>{
+      const active = !els.quiz.classList.contains('active');
+      els.quiz.classList.toggle('active', active);
+      els.quizBtn.setAttribute('aria-pressed', String(active));
+      if(active) showQuiz();
+    });
+    els.reveal.addEventListener('click', ()=> els.quizDef.classList.remove('hidden'));
+    els.next.addEventListener('click', ()=>{ state.quizIdx++; showQuiz(); });
+    els.shuffle.addEventListener('click', ()=>{ shuffleOrder(); showQuiz(); });
+
+    // Init
+    filterRender();
+    handleHash();
+    window.addEventListener('hashchange', handleHash);
+  </script>
+</body>
+</html>
