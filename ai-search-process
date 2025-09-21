@@ -1,0 +1,1155 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Search Process Map - Complete Technical Guide</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #2c3e50;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* Header Styles */
+        .header {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            color: #2c3e50;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .header p {
+            color: #7f8c8d;
+            font-size: 1.1em;
+            margin-bottom: 25px;
+        }
+
+        /* Navigation Tabs */
+        .nav-tabs {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .nav-tab {
+            padding: 12px 24px;
+            background: #ecf0f1;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .nav-tab::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            transition: left 0.5s;
+        }
+
+        .nav-tab:hover::before {
+            left: 100%;
+        }
+
+        .nav-tab.active {
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(52, 152, 219, 0.3);
+        }
+
+        .nav-tab:hover:not(.active) {
+            background: #d5dbdb;
+            transform: translateY(-1px);
+        }
+
+        /* Platform Info */
+        .platform-info {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 25px;
+            box-shadow: 0 6px 25px rgba(0,0,0,0.08);
+            display: none;
+        }
+
+        .platform-info.active {
+            display: block;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Process Flow */
+        .process-flow {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        /* Process Cards */
+        .process-card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.12);
+            cursor: pointer;
+            transition: all 0.4s ease;
+            position: relative;
+            overflow: hidden;
+            border-left: 5px solid #3498db;
+        }
+
+        .process-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(52, 152, 219, 0.05), rgba(155, 89, 182, 0.05));
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .process-card:hover::before {
+            opacity: 1;
+        }
+
+        .process-card:hover {
+            transform: translateY(-5px) scale(1.02);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.18);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .card-icon {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.2em;
+            margin-right: 15px;
+        }
+
+        .card-title {
+            font-size: 1.4em;
+            font-weight: 700;
+            color: #2c3e50;
+            flex: 1;
+        }
+
+        .card-expand {
+            color: #7f8c8d;
+            font-size: 1.2em;
+            transition: transform 0.3s ease;
+        }
+
+        .process-card.expanded .card-expand {
+            transform: rotate(180deg);
+        }
+
+        .card-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .card-summary {
+            color: #7f8c8d;
+            line-height: 1.6;
+            margin-bottom: 15px;
+        }
+
+        .card-details {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .card-details.show {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; max-height: 0; }
+            to { opacity: 1; max-height: 1000px; }
+        }
+
+        /* Technical Details */
+        .tech-section {
+            margin: 20px 0;
+        }
+
+        .tech-section h4 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+            font-size: 1.1em;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .tech-list {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 10px 0;
+        }
+
+        .tech-list ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .tech-list li {
+            padding: 8px 0;
+            border-bottom: 1px solid #ecf0f1;
+            position: relative;
+            padding-left: 20px;
+        }
+
+        .tech-list li::before {
+            content: '→';
+            position: absolute;
+            left: 0;
+            color: #3498db;
+            font-weight: bold;
+        }
+
+        .tech-list li:last-child {
+            border-bottom: none;
+        }
+
+        /* Platform Specific Styles */
+        .platform-specific {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin: 15px 0;
+        }
+
+        .platform-item {
+            background: linear-gradient(135deg, #ecf0f1, #bdc3c7);
+            border-radius: 8px;
+            padding: 12px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .platform-item:hover {
+            transform: scale(1.05);
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            color: white;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            position: fixed;
+            right: -400px;
+            top: 0;
+            width: 400px;
+            height: 100vh;
+            background: white;
+            box-shadow: -5px 0 15px rgba(0,0,0,0.1);
+            transition: right 0.3s ease;
+            z-index: 1000;
+            overflow-y: auto;
+            padding: 30px;
+        }
+
+        .sidebar.open {
+            right: 0;
+        }
+
+        .sidebar-toggle {
+            position: fixed;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: #3498db;
+            color: white;
+            border: none;
+            border-radius: 50px;
+            width: 60px;
+            height: 60px;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(52, 152, 219, 0.3);
+            z-index: 1001;
+            transition: all 0.3s ease;
+        }
+
+        .sidebar-toggle:hover {
+            transform: translateY(-50%) scale(1.1);
+        }
+
+        /* Progress Indicator */
+        .progress-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: rgba(255,255,255,0.3);
+            z-index: 999;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #3498db, #2980b9);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+
+            .process-flow {
+                grid-template-columns: 1fr;
+            }
+
+            .nav-tabs {
+                gap: 8px;
+            }
+
+            .nav-tab {
+                padding: 8px 16px;
+                font-size: 0.9em;
+            }
+
+            .sidebar {
+                width: 100%;
+                right: -100%;
+            }
+        }
+
+        /* Tooltips */
+        .tooltip {
+            position: relative;
+            cursor: help;
+            color: #3498db;
+            text-decoration: underline;
+        }
+
+        .tooltip::after {
+            content: attr(data-tooltip);
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #2c3e50;
+            color: white;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 0.8em;
+            white-space: nowrap;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s;
+            z-index: 1000;
+        }
+
+        .tooltip:hover::after {
+            opacity: 1;
+        }
+
+        /* Optimization Highlights */
+        .optimization-tip {
+            background: linear-gradient(135deg, #f39c12, #e67e22);
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            position: relative;
+        }
+
+        .optimization-tip::before {
+            content: '💡';
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            font-size: 1.2em;
+        }
+
+        .optimization-tip h5 {
+            margin-left: 30px;
+            margin-bottom: 8px;
+        }
+
+        .optimization-tip p {
+            margin-left: 30px;
+            font-size: 0.9em;
+            line-height: 1.4;
+        }
+    </style>
+</head>
+<body>
+    <div class="progress-container">
+        <div class="progress-bar" id="progressBar"></div>
+    </div>
+
+    <div class="container">
+        <div class="header">
+            <h1><i class="fas fa-search"></i> AI Search Process Map</h1>
+            <p>Complete Technical Guide: From Query Input to Result Generation</p>
+            <div class="nav-tabs">
+                <button class="nav-tab active" data-platform="overview">Overview</button>
+                <button class="nav-tab" data-platform="chatgpt">ChatGPT</button>
+                <button class="nav-tab" data-platform="perplexity">Perplexity</button>
+                <button class="nav-tab" data-platform="claude">Claude</button>
+                <button class="nav-tab" data-platform="gemini">Gemini</button>
+                <button class="nav-tab" data-platform="searchgpt">SearchGPT</button>
+            </div>
+        </div>
+
+        <!-- Platform Information Sections -->
+        <div id="platform-overview" class="platform-info active">
+            <h3><i class="fas fa-info-circle"></i> AI Search Process Overview</h3>
+            <p>This comprehensive guide maps the complete technical architecture of AI search systems, from initial query processing through advanced retrieval-augmented generation (RAG) to final response synthesis. Each platform implements these core processes with unique optimizations and architectural choices.</p>
+        </div>
+        <div id="platform-chatgpt" class="platform-info">
+            <h3><i class="fab fa-openai"></i> ChatGPT Search Architecture</h3>
+            <p><strong>Core Technology:</strong> GPT-4 with web browsing, code interpreter, and DALL-E integration</p>
+            <p><strong>Search Method:</strong> Bing API integration with custom ranking algorithms and real-time web access</p>
+            <p><strong>Unique Features:</strong> Multi-modal responses, code execution, conversation memory, plugin ecosystem</p>
+        </div>
+
+        <div id="platform-perplexity" class="platform-info">
+            <h3><i class="fas fa-atom"></i> Perplexity Search Architecture</h3>
+            <p><strong>Core Technology:</strong> Multiple LLMs (Claude, GPT-4, Llama) with specialized search infrastructure</p>
+            <p><strong>Search Method:</strong> Real-time web indexing with source citation and fact-checking mechanisms</p>
+            <p><strong>Unique Features:</strong> Source transparency, academic search mode, real-time information synthesis</p>
+        </div>
+
+        <div id="platform-claude" class="platform-info">
+            <h3><i class="fas fa-robot"></i> Claude Search Architecture</h3>
+            <p><strong>Core Technology:</strong> Anthropic's Claude with constitutional AI training</p>
+            <p><strong>Search Method:</strong> Contextual reasoning with web access through integrated tools</p>
+            <p><strong>Unique Features:</strong> Constitutional AI safety, long-context processing, analytical depth</p>
+        </div>
+
+        <div id="platform-gemini" class="platform-info">
+            <h3><i class="fab fa-google"></i> Gemini Search Architecture</h3>
+            <p><strong>Core Technology:</strong> Google's Gemini Ultra with deep Google services integration</p>
+            <p><strong>Search Method:</strong> Google Search integration with Knowledge Graph and real-time data</p>
+            <p><strong>Unique Features:</strong> Native Google ecosystem integration, multimodal understanding, real-time data access</p>
+        </div>
+
+        <div id="platform-searchgpt" class="platform-info">
+            <h3><i class="fas fa-search-plus"></i> SearchGPT Architecture</h3>
+            <p><strong>Core Technology:</strong> GPT-4 optimized specifically for search with publisher partnerships</p>
+            <p><strong>Search Method:</strong> Real-time web crawling with attribution and publisher revenue sharing</p>
+            <p><strong>Unique Features:</strong> Publisher partnerships, transparent attribution, search-optimized responses</p>
+        </div>
+
+        <!-- Main Process Flow Cards -->
+        <div class="process-flow">
+            <!-- Query Input & Preprocessing -->
+            <div class="process-card" data-step="1">
+                <div class="card-header">
+                    <div class="card-icon"><i class="fas fa-keyboard"></i></div>
+                    <div class="card-title">Query Input & Preprocessing</div>
+                    <div class="card-expand"><i class="fas fa-chevron-down"></i></div>
+                </div>
+                <div class="card-content">
+                    <div class="card-summary">
+                        Initial processing of user queries including normalization, language detection, and basic intent classification.
+                    </div>
+                    <div class="card-details">
+                        <div class="tech-section">
+                            <h4><i class="fas fa-cogs"></i> Technical Components</h4>
+                            <div class="tech-list">
+                                <ul>
+                                    <li><strong>Text Normalization:</strong> Unicode standardization, case folding, punctuation handling</li>
+                                    <li><strong>Language Detection:</strong> Statistical models (n-gram analysis) and neural language identification</li>
+                                    <li><strong>Tokenization:</strong> BPE (Byte-Pair Encoding), WordPiece, or SentencePiece tokenization</li>
+                                    <li><strong>Query Classification:</strong> Intent classification using transformer-based classifiers</li>
+                                    <li><strong>Spam Detection:</strong> Pattern recognition to filter malicious or irrelevant queries</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="tech-section">
+                            <h4><i class="fas fa-microchip"></i> Platform Implementations</h4>
+                            <div class="platform-specific">
+                                <div class="platform-item">
+                                    <strong>ChatGPT:</strong> GPT tokenizer with conversation context preservation
+                                </div>
+                                <div class="platform-item">
+                                    <strong>Perplexity:</strong> Multi-language preprocessing with search-specific optimization
+                                </div>
+                                <div class="platform-item">
+                                    <strong>Claude:</strong> Constitutional AI filtering integrated into preprocessing
+                                </div>
+                                <div class="platform-item">
+                                    <strong>Gemini:</strong> Google's multilingual preprocessing with Knowledge Graph integration
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="optimization-tip">
+                            <h5>Optimization Strategy: Query Formulation</h5>
+                            <p>Structure queries using natural language patterns. Use specific, descriptive terms and include context. For technical queries, include relevant terminology and specify desired output format.</p>
+                        </div>
+
+                        <div class="tech-section">
+                            <h4><i class="fas fa-industry"></i> Industry Examples</h4>
+                            <div class="tech-list">
+                                <ul>
+                                    <li><strong>E-commerce:</strong> "Best wireless headphones under $200 for running" → Product search with price and use-case filters</li>
+                                    <li><strong>Healthcare:</strong> "Symptoms of vitamin D deficiency in adults" → Medical information with safety disclaimers</li>
+                                    <li><strong>Finance:</strong> "How to calculate compound interest for retirement planning" → Educational content with calculation tools</li>
+                                    <li><strong>Education:</strong> "Explain quantum mechanics for high school students" → Level-appropriate educational content</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Intent Analysis & Classification -->
+            <div class="process-card" data-step="2">
+                <div class="card-header">
+                    <div class="card-icon"><i class="fas fa-brain"></i></div>
+                    <div class="card-title">Intent Analysis & Classification</div>
+                    <div class="card-expand"><i class="fas fa-chevron-down"></i></div>
+                </div>
+                <div class="card-content">
+                    <div class="card-summary">
+                        Advanced analysis to understand user intent, query complexity, and determine optimal response strategy.
+                    </div>
+                    <div class="card-details">
+                        <div class="tech-section">
+                            <h4><i class="fas fa-cogs"></i> Technical Components</h4>
+                            <div class="tech-list">
+                                <ul>
+                                    <li><strong>Intent Classification:</strong> Multi-class classification (informational, navigational, transactional)</li>
+                                    <li><strong>Named Entity Recognition (NER):</strong> Identification of people, places, organizations, dates</li>
+                                    <li><strong>Semantic Analysis:</strong> Understanding relationships and context using transformer models</li>
+                                    <li><strong>Query Complexity Assessment:</strong> Determining single-hop vs. multi-hop reasoning requirements</li>
+                                    <li><strong>Temporal Analysis:</strong> Detection of time-sensitive information needs</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="tech-section">
+                            <h4><i class="fas fa-microchip"></i> Platform Implementations</h4>
+                            <div class="platform-specific">
+                                <div class="platform-item">
+                                    <strong>ChatGPT:</strong> GPT-4 native understanding with conversation context
+                                </div>
+                                <div class="platform-item">
+                                    <strong>Perplexity:</strong> Ensemble of specialized models for different intent types
+                                </div>
+                                <div class="platform-item">
+                                    <strong>Claude:</strong> Constitutional AI principles guide intent understanding
+                                </div>
+                                <div class="platform-item">
+                                    <strong>Gemini:</strong> Integration with Google's knowledge graph for entity resolution
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="optimization-tip">
+                            <h5>Optimization Strategy: Intent Clarity</h5>
+                            <p>Be explicit about your intent. Use action verbs (explain, compare, analyze, list). Include context about your audience or use case to help AI systems provide appropriately targeted responses.</p>
+                        </div>
+
+                        <div class="tech-section">
+                            <h4><i class="fas fa-industry"></i> Industry Examples</h4>
+                            <div class="tech-list">
+                                <ul>
+                                    <li><strong>Legal:</strong> "Explain contract law implications" → Requires authoritative, detailed analysis</li>
+                                    <li><strong>Technology:</strong> "Compare cloud providers for startups" → Comparative analysis with business context</li>
+                                    <li><strong>Travel:</strong> "Best time to visit Japan for cherry blossoms" → Temporal and cultural information synthesis</li>
+                                    <li><strong>Research:</strong> "Recent advances in renewable energy storage" → Academic and technical content priority</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Embedding Generation -->
+            <div class="process-card" data-step="3">
+                <div class="card-header">
+                    <div class="card-icon"><i class="fas fa-vector-square"></i></div>
+                    <div class="card-title">Embedding Generation</div>
+                    <div class="card-expand"><i class="fas fa-chevron-down"></i></div>
+                </div>
+                <div class="card-content">
+                    <div class="card-summary">
+                        Conversion of text into high-dimensional vector representations for semantic similarity matching and retrieval.
+                    </div>
+                    <div class="card-details">
+                        <div class="tech-section">
+                            <h4><i class="fas fa-cogs"></i> Technical Components</h4>
+                            <div class="tech-list">
+                                <ul>
+                                    <li><strong>Transformer Encoders:</strong> BERT, RoBERTa, E5, or custom embedding models</li>
+                                    <li><strong>Vector Dimensions:</strong> Typically 384-1536 dimensions for semantic representation</li>
+                                    <li><strong>Normalization:</strong> L2 normalization for cosine similarity computation</li>
+                                    <li><strong>Multimodal Embeddings:</strong> CLIP-like models for text-image joint representations</li>
+                                    <li><strong>Domain Adaptation:</strong> Fine-tuned embeddings for specific knowledge domains</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="tech-section">
+                            <h4><i class="fas fa-microchip"></i> Platform Implementations</h4>
+                            <div class="platform-specific">
+                                <div class="platform-item">
+                                    <strong>ChatGPT:</strong> OpenAI text-embedding-3 models with 1536 dimensions
+                                </div>
+                                <div class="platform-item">
+                                    <strong>Perplexity:</strong> Custom embeddings optimized for search relevance
+                                </div>
+                                <div class="platform-item">
+                                    <strong>Claude:</strong> Anthropic's embedding models with safety alignment
+                                </div>
+                                <div class="platform-item">
+                                    <strong>Gemini:</strong> PaLM-based embeddings with multimodal capabilities
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="optimization-tip">
+                            <h5>Optimization Strategy: Semantic Richness</h5>
+                            <p>Include related terms and synonyms in your content. Use semantic clustering of related concepts. Structure content with clear topic hierarchies to improve embedding quality and retrieval relevance.</p>
+                        </div>
+
+                        <div class="tech-section">
+                            <h4><i class="fas fa-industry"></i> Industry Examples</h4>
+                            <div class="tech-list">
+                                <ul>
+                                    <li><strong>Medical:</strong> Symptom descriptions → Medical condition embeddings with ICD-10 mapping</li>
+                                    <li><strong>Legal:</strong> Case descriptions → Legal precedent embeddings with citation networks</li>
+                                    <li><strong>Academic:</strong> Research abstracts → Paper embeddings with field-specific terminology</li>
+                                    <li><strong>Business:</strong> Company descriptions → Industry embeddings with competitive analysis</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Knowledge Retrieval (RAG Pipeline) -->
+            <div class="process-card" data-step="4">
+                <div class="card-header">
+                    <div class="card-icon"><i class="fas fa-database"></i></div>
+                    <div class="card-title">Knowledge Retrieval (RAG Pipeline)</div>
+                    <div class="card-expand"><i class="fas fa-chevron-down"></i></div>
+                </div>
+                <div class="card-content">
+                    <div class="card-summary">
+                        Retrieval-Augmented Generation system that searches knowledge bases and web sources for relevant information.
+                    </div>
+                    <div class="card-details">
+                        <div class="tech-section">
+                            <h4><i class="fas fa-cogs"></i> Technical Components</h4>
+                            <div class="tech-list">
+                                <ul>
+                                    <li><strong>Vector Databases:</strong> Pinecone, Weaviate, Milvus, or Chroma for embedding storage</li>
+                                    <li><strong>Hybrid Search:</strong> Combination of dense (vector) and sparse (BM25) retrieval</li>
+                                    <li><strong>Multi-Stage Retrieval:</strong> Initial retrieval followed by re-ranking and filtering</li>
+                                    <li><strong>Web Crawling:</strong> Real-time or cached web content retrieval with freshness scoring</li>
+                                    <li><strong>Knowledge Graphs:</strong> Structured knowledge representation (Wikidata, proprietary KGs)</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="tech-section">
+                            <h4><i class="fas fa-microchip"></i> Platform Implementations</h4>
+                            <div class="platform-specific">
+                                <div class="platform-item">
+                                    <strong>ChatGPT:</strong> Bing API + proprietary knowledge base with real-time web access
+                                </div>
+                                <div class="platform-item">
+                                    <strong>Perplexity:</strong> Multi-source aggregation with real-time indexing and source verification
+                                </div>
+                                <div class="platform-item">
+                                    <strong>Claude:</strong> Curated knowledge sources with safety-filtered retrieval
+                                </div>
+                                <div class="platform-item">
+                                    <strong>Gemini:</strong> Google Search + Knowledge Graph + Scholar integration
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="optimization-tip">
+                            <h5>Optimization Strategy: Source Visibility</h5>
+                            <p>Ensure your content is crawlable and well-structured. Use schema markup, clear headings, and semantic HTML. Create comprehensive, authoritative content that establishes topical authority in your domain.</p>
+                        </div>
+
+                        <div class="tech-section">
+                            <h4><i class="fas fa-industry"></i> Industry Examples</h4>
+                            <div class="tech-list">
+                                <ul>
+                                    <li><strong>Healthcare:</strong> PubMed abstracts + medical databases → Evidence-based health information</li>
+                                    <li><strong>Legal:</strong> Case law databases + statutes → Legal precedent and regulation lookup</li>
+                                    <li><strong>Finance:</strong> SEC filings + market data → Company analysis and financial insights</li>
+                                    <li><strong>Technology:</strong> Documentation + Stack Overflow + GitHub → Technical problem-solving</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Vector Search & Semantic Matching -->
+            <div class="process-card" data-step="5">
+                <div class="card-header">
+                    <div class="card-icon"><i class="fas fa-project-diagram"></i></div>
+                    <div class="card-title">Vector Search & Semantic Matching</div>
+                    <div class="card-expand"><i class="fas fa-chevron-down"></i></div>
+                </div>
+                <div class="card-content">
+                    <div class="card-summary">
+                        High-performance similarity search in vector space to find semantically relevant content and information.
+                    </div>
+                    <div class="card-details">
+                        <div class="tech-section">
+                            <h4><i class="fas fa-cogs"></i> Technical Components</h4>
+                            <div class="tech-list">
+                                <ul>
+                                    <li><strong>Approximate Nearest Neighbors (ANN):</strong> HNSW, IVF, or LSH algorithms for fast search</li>
+                                    <li><strong>Similarity Metrics:</strong> Cosine similarity, Euclidean distance, or dot product</li>
+                                    <li><strong>Index Optimization:</strong> Quantization, pruning, and compression for scale</li>
+                                    <li><strong>Multi-Vector Search:</strong> Query expansion and multiple embedding strategies</li>
+                                    <li><strong>Filtering & Metadata:</strong> Post-retrieval filtering based on freshness, authority, relevance</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="tech-section">
+                            <h4><i class="fas fa-microchip"></i> Platform Implementations</h4>
+                            <div class="platform-specific">
+                                <div class="platform-item">
+                                    <strong>ChatGPT:</strong> Optimized vector search with conversation context integration
+                                </div>
+                                <div class="platform-item">
+                                    <strong>Perplexity:</strong> Multi-index search with real-time result fusion
+                                </div>
+                                <div class="platform-item">
+                                    <strong>Claude:</strong> Safety-aware vector search with content filtering
+                                </div>
+                                <div class="platform-item">
+                                    <strong>Gemini:</strong> Google-scale vector infrastructure with Knowledge Graph integration
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="optimization-tip">
+                            <h5>Optimization Strategy: Semantic Density</h5>
+                            <p>Create content with high semantic density. Use topic clusters, related keywords, and comprehensive coverage. Include FAQ sections and address related queries to increase semantic matching opportunities.</p>
+                        </div>
+
+                        <div class="tech-section">
+                            <h4><i class="fas fa-industry"></i> Industry Examples</h4>
+                            <div class="tech-list">
+                                <ul>
+                                    <li><strong>E-learning:</strong> Course content → Personalized learning path recommendations</li>
+                                    <li><strong>Customer Support:</strong> Knowledge base articles → Automated help desk responses</li>
+                                    <li><strong>Research:</strong> Academic papers → Literature review and citation discovery</li>
+                                    <li><strong>Product Discovery:</strong> Product descriptions → Recommendation and comparison systems</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Context Synthesis & Ranking -->
+            <div class="process-card" data-step="6">
+                <div class="card-header">
+                    <div class="card-icon"><i class="fas fa-sort-amount-up"></i></div>
+                    <div class="card-title">Context Synthesis & Ranking</div>
+                    <div class="card-expand"><i class="fas fa-chevron-down"></i></div>
+                </div>
+                <div class="card-content">
+                    <div class="card-summary">
+                        Intelligent ranking and synthesis of retrieved information to create coherent context for response generation.
+                    </div>
+                    <div class="card-details">
+                        <div class="tech-section">
+                            <h4><i class="fas fa-cogs"></i> Technical Components</h4>
+                            <div class="tech-list">
+                                <ul>
+                                    <li><strong>Learning-to-Rank (LTR):</strong> ML models for relevance scoring and result ordering</li>
+                                    <li><strong>Cross-Encoder Reranking:</strong> BERT/T5-based models for pairwise comparison</li>
+                                    <li><strong>Diversity & Freshness:</strong> Balancing relevance with information diversity and recency</li>
+                                    <li><strong>Source Authority Scoring:</strong> Domain authority, E-A-T signals, and trust metrics</li>
+                                    <li><strong>Conflict Resolution:</strong> Handling contradictory information from multiple sources</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="tech-section">
+                            <h4><i class="fas fa-microchip"></i> Platform Implementations</h4>
+                            <div class="platform-specific">
+                                <div class="platform-item">
+                                    <strong>ChatGPT:</strong> GPT-4 native context synthesis with conversation threading
+                                </div>
+                                <div class="platform-item">
+                                    <strong>Perplexity:</strong> Multi-source ranking with citation transparency and verification
+                                </div>
+                                <div class="platform-item">
+                                    <strong>Claude:</strong> Constitutional AI principles in content ranking and synthesis
+                                </div>
+                                <div class="platform-item">
+                                    <strong>Gemini:</strong> PageRank-influenced authority scoring with Knowledge Graph validation
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="optimization-tip">
+                            <h5>Optimization Strategy: Authority Building</h5>
+                            <p>Establish domain expertise through comprehensive, well-researched content. Build backlinks from authoritative sources. Use proper citations and references. Maintain content freshness and accuracy.</p>
+                        </div>
+
+                        <div class="tech-section">
+                            <h4><i class="fas fa-industry"></i> Industry Examples</h4>
+                            <div class="tech-list">
+                                <ul>
+                                    <li><strong>News Media:</strong> Breaking news aggregation with source credibility verification</li>
+                                    <li><strong>Academic:</strong> Research synthesis with peer-review and impact factor weighting</li>
+                                    <li><strong>Product Reviews:</strong> Multi-source review aggregation with bias detection</li>
+                                    <li><strong>Market Research:</strong> Competitive intelligence with data source validation</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Response Generation -->
+            <div class="process-card" data-step="7">
+                <div class="card-header">
+                    <div class="card-icon"><i class="fas fa-edit"></i></div>
+                    <div class="card-title">Response Generation</div>
+                    <div class="card-expand"><i class="fas fa-chevron-down"></i></div>
+                </div>
+                <div class="card-content">
+                    <div class="card-summary">
+                        Large language model-powered generation of comprehensive, accurate, and contextually appropriate responses.
+                    </div>
+                    <div class="card-details">
+                        <div class="tech-section">
+                            <h4><i class="fas fa-cogs"></i> Technical Components</h4>
+                            <div class="tech-list">
+                                <ul>
+                                    <li><strong>Autoregressive Generation:</strong> Token-by-token generation with attention mechanisms</li>
+                                    <li><strong>Context Window Management:</strong> Handling long contexts (4k-200k+ tokens)</li>
+                                    <li><strong>Hallucination Mitigation:</strong> Grounding responses in retrieved evidence</li>
+                                    <li><strong>Multi-turn Coherence:</strong> Maintaining context across conversation turns</li>
+                                    <li><strong>Safety & Alignment:</strong> Content filtering and harmful output prevention</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="tech-section">
+                            <h4><i class="fas fa-microchip"></i> Platform Implementations</h4>
+                            <div class="platform-specific">
+                                <div class="platform-item">
+                                    <strong>ChatGPT:</strong> GPT-4 with RLHF training and safety guardrails
+                                </div>
+                                <div class="platform-item">
+                                    <strong>Perplexity:</strong> Multi-model ensemble with source attribution integration
+                                </div>
+                                <div class="platform-item">
+                                    <strong>Claude:</strong> Constitutional AI with enhanced reasoning and safety
+                                </div>
+                                <div class="platform-item">
+                                    <strong>Gemini:</strong> Multimodal generation with Google services integration
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="optimization-tip">
+                            <h5>Optimization Strategy: Answer Completeness</h5>
+                            <p>Structure content to directly answer common questions. Use clear headings and bullet points. Provide step-by-step explanations. Include examples and use cases to demonstrate concepts clearly.</p>
+                        </div>
+
+                        <div class="tech-section">
+                            <h4><i class="fas fa-industry"></i> Industry Examples</h4>
+                            <div class="tech-list">
+                                <ul>
+                                    <li><strong>Education:</strong> Personalized tutoring with adaptive explanation styles</li>
+                                    <li><strong>Healthcare:</strong> Medical information with appropriate disclaimers and safety warnings</li>
+                                    <li><strong>Creative:</strong> Content generation for marketing, writing, and design</li>
+                                    <li><strong>Technical:</strong> Code generation and debugging assistance with best practices</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Output Optimization -->
+            <div class="process-card" data-step="8">
+                <div class="card-header">
+                    <div class="card-icon"><i class="fas fa-bullseye"></i></div>
+                    <div class="card-title">Output Optimization</div>
+                    <div class="card-expand"><i class="fas fa-chevron-down"></i></div>
+                </div>
+                <div class="card-content">
+                    <div class="card-summary">
+                        Final optimization and formatting of responses for clarity, accuracy, and user experience enhancement.
+                    </div>
+                    <div class="card-details">
+                        <div class="tech-section">
+                            <h4><i class="fas fa-cogs"></i> Technical Components</h4>
+                            <div class="tech-list">
+                                <ul>
+                                    <li><strong>Post-Processing Filters:</strong> Content safety, factual verification, and bias detection</li>
+                                    <li><strong>Format Optimization:</strong> Markdown rendering, code highlighting, and visual formatting</li>
+                                    <li><strong>Citation Generation:</strong> Automatic source attribution and reference formatting</li>
+                                    <li><strong>Personalization:</strong> User preference adaptation and response style customization</li>
+                                    <li><strong>Quality Assurance:</strong> Response completeness and accuracy validation</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="tech-section">
+                            <h4><i class="fas fa-microchip"></i> Platform Implementations</h4>
+                            <div class="platform-specific">
+                                <div class="platform-item">
+                                    <strong>ChatGPT:</strong> Rich formatting with code execution and image generation
+                                </div>
+                                <div class="platform-item">
+                                    <strong>Perplexity:</strong> Comprehensive citations with source links and verification
+                                </div>
+                                <div class="platform-item">
+                                    <strong>Claude:</strong> Safety-first optimization with nuanced ethical considerations
+                                </div>
+                                <div class="platform-item">
+                                    <strong>Gemini:</strong> Multimodal outputs with integrated Google services
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="optimization-tip">
+                            <h5>Optimization Strategy: User Experience</h5>
+                            <p>Design content for scannability with clear headings, bullet points, and visual hierarchy. Include actionable takeaways and next steps. Optimize for mobile reading with short paragraphs and clear formatting.</p>
+                        </div>
+
+                        <div class="tech-section">
+                            <h4><i class="fas fa-industry"></i> Industry Examples</h4>
+                            <div class="tech-list">
+                                <ul>
+                                    <li><strong>Journalism:</strong> Fact-checked articles with transparent source attribution</li>
+                                    <li><strong>Education:</strong> Learning-optimized content with progressive difficulty levels</li>
+                                    <li><strong>Business:</strong> Executive summaries with actionable insights and recommendations</li>
+                                    <li><strong>Technical:</strong> Documentation with code examples and implementation guides</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sidebar for Optimization Strategies -->
+        <div class="sidebar" id="sidebar">
+            <h2><i class="fas fa-rocket"></i> AI Search Optimization Guide</h2>
+
+            <div class="optimization-section">
+                <h3><i class="fas fa-lightbulb"></i> Content Optimization</h3>
+                <div class="tech-list">
+                    <ul>
+                        <li><strong>E-A-T Optimization:</strong> Establish Expertise, Authoritativeness, and Trustworthiness</li>
+                        <li><strong>Semantic Clustering:</strong> Group related topics and concepts together</li>
+                        <li><strong>Question Optimization:</strong> Structure content around natural language questions</li>
+                        <li><strong>Citation Networks:</strong> Build authoritative source relationships</li>
+                        <li><strong>Freshness Signals:</strong> Regular content updates and time-sensitive information</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="optimization-section">
+                <h3><i class="fas fa-code"></i> Technical SEO for AI</h3>
+                <div class="tech-list">
+                    <ul>
+                        <li><strong>Schema Markup:</strong> Structured data for better understanding</li>
+                        <li><strong>Fast Loading:</strong> Core Web Vitals optimization</li>
+                        <li><strong>Mobile First:</strong> Responsive design and mobile optimization</li>
+                        <li><strong>Crawlability:</strong> Clean URL structure and internal linking</li>
+                        <li><strong>Content Architecture:</strong> Logical information hierarchy</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="optimization-section">
+                <h3><i class="fas fa-chart-line"></i> Performance Metrics</h3>
+                <div class="tech-list">
+                    <ul>
+                        <li><strong>AI Visibility Score:</strong> Track mentions in AI responses</li>
+                        <li><strong>Citation Frequency:</strong> How often your content is referenced</li>
+                        <li><strong>Query Coverage:</strong> Range of topics your content addresses</li>
+                        <li><strong>Authority Signals:</strong> Backlinks and domain trust metrics</li>
+                        <li><strong>User Engagement:</strong> Dwell time and interaction rates</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <button class="sidebar-toggle" onclick="toggleSidebar()">
+            <i class="fas fa-cog"></i>
+        </button>
+    </div>
+
+    <script>
+        // Tab switching functionality
+        const tabs = document.querySelectorAll('.nav-tab');
+        const platformInfos = document.querySelectorAll('.platform-info');
+
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                // Remove active class from all tabs and platform info
+                tabs.forEach(t => t.classList.remove('active'));
+                platformInfos.forEach(info => info.classList.remove('active'));
+
+                // Add active class to clicked tab
+                tab.classList.add('active');
+
+                // Show corresponding platform info
+                const platform = tab.dataset.platform;
+                const platformInfo = document.getElementById(`platform-${platform}`);
+                if (platformInfo) {
+                    platformInfo.classList.add('active');
+                }
+            });
+        });
+
+        // Card expansion functionality
+        const processCards = document.querySelectorAll('.process-card');
+
+        processCards.forEach(card => {
+            card.addEventListener('click', () => {
+                const details = card.querySelector('.card-details');
+                const isExpanded = card.classList.contains('expanded');
+
+                if (isExpanded) {
+                    card.classList.remove('expanded');
+                    details.classList.remove('show');
+                } else {
+                    card.classList.add('expanded');
+                    details.classList.add('show');
+                }
+
+                updateProgress();
+            });
+        });
+
+        // Sidebar toggle
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            sidebar.classList.toggle('open');
+        }
+
+        // Progress indicator
+        function updateProgress() {
+            const totalCards = processCards.length;
+            const expandedCards = document.querySelectorAll('.process-card.expanded').length;
+            const progressPercent = (expandedCards / totalCards) * 100;
+
+            const progressBar = document.getElementById('progressBar');
+            progressBar.style.width = progressPercent + '%';
+        }
+
+        // Smooth scrolling for card navigation
+        function scrollToCard(step) {
+            const card = document.querySelector(`[data-step="${step}"]`);
+            if (card) {
+                card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+        }
+
+        // Keyboard navigation
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                // Collapse all cards
+                processCards.forEach(card => {
+                    card.classList.remove('expanded');
+                    const details = card.querySelector('.card-details');
+                    details.classList.remove('show');
+                });
+                updateProgress();
+            }
+        });
+
+        // Initialize tooltips (simple implementation)
+        const tooltips = document.querySelectorAll('.tooltip');
+        tooltips.forEach(tooltip => {
+            tooltip.addEventListener('mouseenter', () => {
+                // Tooltip is handled by CSS
+            });
+        });
+
+        // Auto-expand first card on load
+        document.addEventListener('DOMContentLoaded', () => {
+            const firstCard = document.querySelector('.process-card');
+            if (firstCard) {
+                firstCard.click();
+            }
+        });
+
+        // Intersection Observer for scroll-based animations
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.animationPlayState = 'running';
+                }
+            });
+        }, { threshold: 0.1 });
+
+        processCards.forEach(card => {
+            observer.observe(card);
+        });
+    </script>
+</body>
+</html>
